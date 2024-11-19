@@ -19,7 +19,6 @@ week-planner-react/
 │   │   └── useLocalStorage.js
 │   ├── utils/           # Utilitaires
 │   │   └── constants.js
-│   ├── App.css          # Styles de l'app
 │   ├── App.jsx          # Composant principal
 │   ├── index.css        # Styles globaux
 │   └── main.jsx         # Point d'entrée
