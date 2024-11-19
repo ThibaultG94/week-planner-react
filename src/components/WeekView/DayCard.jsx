@@ -1,20 +1,21 @@
 import React from 'react';
-import Task from '../Task';
+import DayCard from './DayCard';
+import { DAYS_OF_WEEK } from '../../utils/constants';
 
-const DayCard = ({ day, tasks }) => {
+const WeekView = ({ tasks, onDeleteTask, onEditTask }) => {
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">{day}</h2>
-      <div className="space-y-2">
-        {tasks.map((task) => (
-          <Task key={task.id} task={task} />
-        ))}
-        {tasks.length === 0 && (
-          <p className="text-gray-500 text-sm">Aucune tâche pour ce jour</p>
-        )}
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+      {DAYS_OF_WEEK.map((day) => (
+        <DayCard 
+          key={day} 
+          day={day}
+          tasks={tasks.filter(task => task.day === day)}
+          onDeleteTask={onDeleteTask}
+          onEditTask={onEditTask}
+        />
+      ))}
     </div>
   );
 };
 
-export default DayCard;
+export default WeekView;

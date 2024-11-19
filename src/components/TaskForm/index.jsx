@@ -26,7 +26,7 @@ const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 mb-6">
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
       <div className="space-y-4">
         <div className="flex gap-4">
           <input
@@ -34,13 +34,13 @@ const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
             value={task.title}
             onChange={(e) => setTask({ ...task, title: e.target.value })}
             placeholder="Nouvelle tâche..."
-            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 rounded-md border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors"
             required
           />
           <select
             value={task.day}
             onChange={(e) => setTask({ ...task, day: e.target.value })}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="px-4 py-2 rounded-md border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 bg-white transition-colors"
           >
             {DAYS_OF_WEEK.map(day => (
               <option key={day} value={day}>{day}</option>
@@ -51,15 +51,15 @@ const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
           value={task.note}
           onChange={(e) => setTask({ ...task, note: e.target.value })}
           placeholder="Ajouter une note (optionnel)"
-          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="w-full px-4 py-2 rounded-md border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors"
           rows="2"
         />
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-2">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-2 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
             >
               <X size={16} className="inline-block mr-1" />
               Annuler
@@ -67,7 +67,7 @@ const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
           )}
           <button
             type="submit"
-            className="px-3 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
+            className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors"
           >
             <Plus size={16} className="inline-block mr-1" />
             {task.id ? 'Mettre à jour' : 'Ajouter'}
