@@ -2,38 +2,52 @@
 
 ```
 week-planner-react/
-├── src/
-│   ├── components/           # Composants réutilisables
-│   │   ├── WeekView/        # Vue principale de la semaine
-│   │   │   ├── index.jsx    # Composant conteneur
-│   │   │   └── DayCard.jsx  # Carte pour chaque jour
-│   │   ├── TaskForm/        # Formulaire d'ajout de tâche
+├── node_modules/          # Dépendances du projet
+├── public/
+│   ├── vite.svg          # Logo Vite
+│   └── react.svg         # Logo React
+├── src/                  # Code source
+│   ├── components/       # Composants React
+│   │   ├── Task/        # Composant Tâche
 │   │   │   └── index.jsx
-│   │   └── Task/           # Composant de tâche individuelle
-│   │       └── index.jsx
-│   ├── hooks/              # Custom hooks
-│   │   └── useLocalStorage.js  # Hook pour la persistance
-│   ├── utils/              # Utilitaires
-│   │   └── constants.js    # Constantes (jours, etc.)
-│   ├── App.jsx            # Composant racine
-│   ├── main.jsx          # Point d'entrée
-│   └── index.css         # Styles globaux
-├── public/               # Assets statiques
-├── tailwind.config.js   # Configuration Tailwind
-└── package.json         # Dépendances
+│   │   ├── TaskForm/    # Formulaire de tâches
+│   │   │   └── index.jsx
+│   │   └── WeekView/    # Vue hebdomadaire
+│   │       ├── index.jsx
+│   │       └── DayCard.jsx
+│   ├── hooks/           # Custom hooks React
+│   │   └── useLocalStorage.js
+│   ├── utils/           # Utilitaires
+│   │   └── constants.js
+│   ├── App.css          # Styles de l'app
+│   ├── App.jsx          # Composant principal
+│   ├── index.css        # Styles globaux
+│   └── main.jsx         # Point d'entrée
+├── .gitignore           # Fichiers à ignorer par Git
+├── eslint.config.js     # Configuration ESLint
+├── index.html           # Page HTML principale
+├── package.json         # Configuration du projet
+├── postcss.config.js    # Configuration PostCSS
+├── README.md           # Documentation
+├── structure.md        # Structure du projet
+├── tailwind.config.js  # Configuration Tailwind
+└── vite.config.js      # Configuration Vite
 ```
 
-## Description des composants
+## Description des fichiers principaux
 
-- `WeekView`: Affiche la grille hebdomadaire
-- `DayCard`: Gère l'affichage des tâches pour un jour
-- `TaskForm`: Formulaire pour créer/éditer des tâches
-- `Task`: Affiche une tâche individuelle avec ses actions
+### Fichiers de configuration
 
-## Fonctionnalités clés
+- `package.json`: Gestion des dépendances et scripts
+- `vite.config.js`: Configuration de Vite (bundler)
+- `tailwind.config.js`: Configuration du framework CSS
+- `postcss.config.js`: Configuration de PostCSS
+- `eslint.config.js`: Règles de linting
 
-- Persistance avec localStorage
-- Gestion des tâches par jour
-- Notes associées aux tâches
-- Interface responsive
-- Thème personnalisable
+### Fichiers source principaux
+
+- `index.html`: Point d'entrée HTML
+- `src/main.jsx`: Point d'entrée JavaScript
+- `src/App.jsx`: Composant racine de l'application
+- `src/index.css`: Styles globaux et imports Tailwind
+- `src/App.css`: Styles spécifiques à App
