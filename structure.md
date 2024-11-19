@@ -8,6 +8,9 @@ week-planner-react/
 │   └── react.svg         # Logo React
 ├── src/                  # Code source
 │   ├── components/       # Composants React
+│   │   ├── common/       # Composants réutilisables
+│   │   │   └── DeleteConfirmation/
+│   │   │       └── index.jsx
 │   │   ├── Task/        # Composant Tâche
 │   │   │   └── index.jsx
 │   │   ├── TaskForm/    # Formulaire de tâches
@@ -18,7 +21,8 @@ week-planner-react/
 │   ├── hooks/           # Custom hooks React
 │   │   └── useLocalStorage.js
 │   ├── utils/           # Utilitaires
-│   │   └── constants.js
+│   │   ├── constants.js
+│   │   └── validation.js # Nouvelles fonctions de validation
 │   ├── App.jsx          # Composant principal
 │   ├── index.css        # Styles globaux
 │   └── main.jsx         # Point d'entrée
