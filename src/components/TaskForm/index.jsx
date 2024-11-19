@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DAYS_OF_WEEK } from '../../utils/constants';
 import { Plus, X, AlertCircle } from 'lucide-react';
+import { validateTask, hasErrors } from '../../utils/validation';
 
 const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
   const [task, setTask] = useState({
@@ -21,17 +22,9 @@ const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
   }, [initialTask]);
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!task.title.trim()) {
-      newErrors.title = 'Le titre est requis';
-    } else if (task.title.length < 3) {
-      newErrors.title = 'Le titre doit contenir au moins 3 caractères';
-    }
-    if (task.note && task.note.length > 200) {
-      newErrors.note = 'La note ne doit pas dépasser 200 caractères';
-    }
+    const newErrors = validateTask(task);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return !hasErrors(newErrors);
   };
 
   const handleSubmit = async (e) => {
