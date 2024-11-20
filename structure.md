@@ -8,6 +8,8 @@ week-planner-react/
 │   └── react.svg         # Logo React
 ├── src/                  # Code source
 │   ├── components/       # Composants React
+│   │   ├── AppHeader/
+│   │   │   └── index.jsx
 │   │   ├── common/       # Composants réutilisables
 │   │   │   └── DeleteConfirmation/
 │   │   │       └── index.jsx

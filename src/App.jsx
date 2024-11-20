@@ -3,7 +3,7 @@ import WeekView from './components/WeekView';
 import TaskForm from './components/TaskForm';
 import useLocalStorage from './hooks/useLocalStorage';
 import { STORAGE_KEY } from './utils/constants';
-import { Calendar } from 'lucide-react';
+import AppHeader from './components/AppHeader';
 
 function App() {
   const [tasks, setTasks] = useLocalStorage(STORAGE_KEY, []);
@@ -39,14 +39,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">WeekPlanner</h1>
-          </div>
-        </div>
-      </header>
+      <AppHeader 
+        onAddTask={handleAddTask} 
+        editingTask={editingTask}
+        onEditComplete={() => setEditingTask(null)} 
+      />
 
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {feedback.message && (
