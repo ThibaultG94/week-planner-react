@@ -1,52 +1,124 @@
 import React, { useState } from 'react';
 import DayColumn from './DayColumn';
+import DragDropContext from './common/DragDropContext';
 import { DAYS_OF_WEEK } from '../utils/constants';
+import useDragAndDrop from '../hooks/useDragAndDrop';
 
 const WeekView = ({ 
   tasks, 
   onTaskUpdate, 
   onDeleteTask, 
   onEditTask, 
-  onTaskComplete 
+  onTaskComplete,
+  onTaskMove: onTaskMoveExternal
 }) => {
-  const [draggedTaskId, setDraggedTaskId] = useState(null);
+  const [draggedTask, setDraggedTask] = useState(null);
 
-  const handleTaskDrop = (e, targetDay, period) => {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData('text/plain');
-    if (!taskId || taskId === draggedTaskId) return;
+  const {
+    activeId,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd
+  } = useDragAndDrop({
+    items: tasks,
+    onReorder: (newTasks, containerId) => {
+      // Mise à jour positions dans un même jour/période
+      const [period, day] = containerId.split('-');
+      const updatedTasks = tasks.map(task => {
+        if (task.day !== day || task.period !== period) return task;
+        const newTask = newTasks.find(t => t.id === task.id);
+        return newTask || task;
+      });
+      onTaskUpdate(updatedTasks);
+    },
+    onMove: ({ taskId, destinationContainer }) => {
+      // Déplacement entre jours/périodes
+      const [newPeriod, newDay] = destinationContainer.split('-');
+      const taskToMove = tasks.find(t => t.id === Number(taskId));
+      
+      if (taskToMove) {
+        const tasksInDestination = tasks.filter(
+          t => t.day === newDay && t.period === newPeriod
+        );
 
-    const updatedTasks = tasks.map(task => {
-      if (task.id === parseInt(taskId)) {
-        const targetTasks = tasks.filter(t => t.day === targetDay && t.period === period);
-        const newPosition = targetTasks.length;
-        return { 
-          ...task, 
-          day: targetDay, 
-          period: period,
-          position: newPosition 
-        };
+        if (tasksInDestination.length >= 4) {
+          console.warn('Impossible de déplacer : période pleine');
+          return;
+        }
+
+        const updatedTasks = tasks.map(task => {
+          if (task.id === Number(taskId)) {
+            return {
+              ...task,
+              day: newDay,
+              period: newPeriod,
+              position: tasksInDestination.length
+            };
+          }
+          return task;
+        });
+
+        onTaskUpdate(updatedTasks);
+        onTaskMoveExternal?.(taskId, newDay, newPeriod);
       }
-      return task;
-    });
+    }
+  });
 
-    onTaskUpdate(updatedTasks);
-    setDraggedTaskId(null);
+  const handleDragStartWrapper = (event) => {
+    const task = tasks.find(t => t.id === event.active.id);
+    setDraggedTask(task);
+    handleDragStart(event);
+  };
+
+  const handleDragEndWrapper = (event) => {
+    handleDragEnd(event);
+    setDraggedTask(null);
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] grid grid-cols-7 gap-2">
-      {DAYS_OF_WEEK.map((day) => (
-        <DayColumn 
-          key={day}
-          day={day}
-          tasks={tasks.filter(task => task.day === day)}
-          onTaskDrop={handleTaskDrop}
-          onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
-          onTaskComplete={onTaskComplete}
-        />
-      ))}
+    <div className="h-[calc(100vh-8rem)]">
+      <DragDropContext
+        items={tasks}
+        onDragStart={handleDragStartWrapper}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEndWrapper}
+      >
+        <div className="grid grid-cols-7 gap-2 h-full">
+          {DAYS_OF_WEEK.map((day) => (
+            <DayColumn 
+              key={day}
+              day={day}
+              tasks={tasks.filter(task => task.day === day)}
+              onTaskComplete={onTaskComplete}
+              onDeleteTask={onDeleteTask}
+              onEditTask={onEditTask}
+              onTaskMove={(taskId, targetDay, targetPeriod) => {
+                const taskToMove = tasks.find(t => t.id === taskId);
+                if (taskToMove && targetDay && targetPeriod) {
+                  onTaskMoveExternal?.(taskId, targetDay, targetPeriod);
+                }
+              }}
+              onTasksReorder={(updatedTasks) => {
+                onTaskUpdate(tasks.map(task => {
+                  const updatedTask = updatedTasks.find(t => t.id === task.id);
+                  return updatedTask || task;
+                }));
+              }}
+              draggedTask={draggedTask}
+              activeId={activeId}
+            />
+          ))}
+        </div>
+      </DragDropContext>
+
+      {/* Visual feedback during dragging */}
+      {draggedTask && (
+        <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 z-50">
+          <p className="text-sm text-gray-600">
+            Déplacement de : <span className="font-medium">{draggedTask.title}</span>
+          </p>
+        </div>
+      )}
     </div>
   );
 };
