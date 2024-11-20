@@ -12,6 +12,8 @@ week-planner-react/
 │   │   │   ├── DeleteConfirmation.jsx   # Modal de confirmation de suppression
 │   │   │   ├── TimeBlock.jsx            # Bloc pour une demi-journée
 │   │   │   └── AddTaskButton.jsx        # Bouton + pour ajouter une tâche
+│   │   │   ├── TaskCard.jsx             # Nouvelle vue de carte de tâche (compacte/détaillée)
+│   │   │   └── AnimatedTransition.jsx   # Composant pour les transitions fluides
 │   │   ├── AppHeader.jsx        # Header avec logo et bouton nouvelle tâche
 │   │   ├── Task.jsx             # Composant tâche avec drag & drop
 │   │   ├── TaskForm.jsx         # Modal formulaire de tâches
@@ -19,12 +21,18 @@ week-planner-react/
 │   │   └── DayColumn.jsx        # Colonne d'une journée avec matin/après-midi
 │   ├── hooks/           # Custom hooks React
 │   │   ├── useLocalStorage.js         # Persistance des données
-│   │   └── useDragAndDrop.js         # Gestion du drag & drop
+│   │   ├── useDragAndDrop.js         # Gestion du drag & drop améliorée
+│   │   ├── useTaskPositioning.js     # Nouveau hook pour le positionnement des tâches
+│   │   └── useViewMode.js            # Nouveau hook pour gérer les modes d'affichage
 │   ├── utils/           # Utilitaires
 │   │   ├── constants.js        # Constantes (jours, storage keys)
-│   │   └── taskHelpers.js      # Fonctions pour la gestion des tâches
+│   │   ├── taskHelpers.js      # Fonctions pour la gestion des tâches
+│   │   ├── validation.js       # Validation des formulaires
+│   │   ├── timeBlocks.js       # Nouvelle gestion des blocs horaires
+│   │   └── animations.js       # Configurations des animations
 │   ├── contexts/       # Contexts React
-│   │   └── TaskContext.jsx    # Gestion globale des tâches
+│   │   ├── TaskContext.jsx    # Gestion globale des tâches
+│   │   └── ViewModeContext.jsx # Gestion du mode d'affichage
 │   ├── App.jsx          # Composant principal
 │   ├── index.css        # Styles globaux
 │   └── main.jsx         # Point d'entrée
