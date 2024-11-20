@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react';
+import AppHeader from './components/AppHeader';
 import WeekView from './components/WeekView';
-import TaskForm from './components/TaskForm';
 import useLocalStorage from './hooks/useLocalStorage';
 import { STORAGE_KEY } from './utils/constants';
-import AppHeader from './components/AppHeader';
 
 function App() {
   const [tasks, setTasks] = useLocalStorage(STORAGE_KEY, []);
@@ -21,7 +20,7 @@ function App() {
         currentTasks.map(task => task.id === newTask.id ? newTask : task)
       );
       setEditingTask(null);
-      showFeedback('Tâche mise à jour avec succès !');
+      showFeedback('Tâche mise à jour !');
     } else {
       setTasks(currentTasks => [...currentTasks, newTask]);
       showFeedback('Nouvelle tâche ajoutée !');
@@ -37,33 +36,56 @@ function App() {
     setEditingTask(task);
   }, []);
 
+  const handleTasksReorder = useCallback((updatedTasks) => {
+    setTasks(updatedTasks);
+  }, [setTasks]);
+
+  const handleTaskComplete = useCallback((taskId) => {
+    setTasks(currentTasks =>
+      currentTasks.map(task =>
+        task.id === taskId
+          ? { ...task, completed: !task.completed }
+          : task
+      )
+    );
+    showFeedback('Statut de la tâche mis à jour !');
+  }, [setTasks]);
+
+  const handleTaskMove = useCallback((taskId, targetDay, targetPeriod) => {
+    setTasks(currentTasks =>
+      currentTasks.map(task =>
+        task.id === taskId
+          ? { ...task, day: targetDay, period: targetPeriod }
+          : task
+      )
+    );
+    showFeedback('Tâche déplacée !');
+  }, [setTasks]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <AppHeader 
-        onAddTask={handleAddTask} 
+        onAddTask={handleAddTask}
         editingTask={editingTask}
-        onEditComplete={() => setEditingTask(null)} 
+        onEditComplete={() => setEditingTask(null)}
       />
 
+      {feedback.message && (
+        <div className={`fixed top-4 right-4 p-4 rounded-md shadow-lg ${
+          feedback.type === 'warning' ? 'bg-yellow-50 text-yellow-700' : 'bg-green-50 text-green-700'
+        }`}>
+          {feedback.message}
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {feedback.message && (
-          <div className={`mb-4 p-4 rounded-md ${
-            feedback.type === 'warning' ? 'bg-yellow-50 text-yellow-700' : 'bg-green-50 text-green-700'
-          }`}>
-            {feedback.message}
-          </div>
-        )}
-        
-        <TaskForm 
-          onSubmit={handleAddTask}
-          initialTask={editingTask}
-          onCancel={editingTask ? () => setEditingTask(null) : null}
-        />
-        
         <WeekView 
           tasks={tasks}
           onDeleteTask={handleDeleteTask}
           onEditTask={handleEditTask}
+          onTaskComplete={handleTaskComplete}
+          onTaskMove={handleTaskMove}
+          onTasksReorder={handleTasksReorder}
         />
       </main>
     </div>

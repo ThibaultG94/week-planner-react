@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import TimeBlock from './common/TimeBlock';
 import { Calendar } from 'lucide-react';
 
-const DayColumn = ({ day, tasks, onAddTask, onTaskDrop, onTaskComplete }) => {
+const DayColumn = ({ day, tasks, onAddTask, onTaskDrop, onTaskComplete, onTasksReorder }) => {
   const isToday = useMemo(() => {
     const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long' })
       .charAt(0).toUpperCase() + 
@@ -16,6 +16,11 @@ const DayColumn = ({ day, tasks, onAddTask, onTaskDrop, onTaskComplete }) => {
       afternoonTasks: tasks.filter(task => task.period === 'afternoon')
     };
   }, [tasks]);
+
+  const handleReorder = (period, reorderedTasks) => {
+    const otherTasks = tasks.filter(task => task.period !== period);
+    onTasksReorder([...otherTasks, ...reorderedTasks]);
+  };
 
   return (
     <div className={`flex flex-col h-full ${
@@ -38,6 +43,7 @@ const DayColumn = ({ day, tasks, onAddTask, onTaskDrop, onTaskComplete }) => {
           onAddTask={() => onAddTask(day, 'morning')}
           onDrop={(e) => onTaskDrop(e, day, 'morning')}
           onTaskComplete={onTaskComplete}
+          onReorder={(tasks) => handleReorder('morning', tasks)}
         />
         
         <TimeBlock
@@ -46,6 +52,7 @@ const DayColumn = ({ day, tasks, onAddTask, onTaskDrop, onTaskComplete }) => {
           onAddTask={() => onAddTask(day, 'afternoon')}
           onDrop={(e) => onTaskDrop(e, day, 'afternoon')}
           onTaskComplete={onTaskComplete}
+          onReorder={(tasks) => handleReorder('afternoon', tasks)}
         />
       </div>
     </div>
