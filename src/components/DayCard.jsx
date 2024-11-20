@@ -1,4 +1,4 @@
-import Task from '../Task';
+import Task from './Task';
 import { CalendarCheck } from 'lucide-react';
 
 const DayCard = ({ day, tasks, onDeleteTask, onEditTask }) => {

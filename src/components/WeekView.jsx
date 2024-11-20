@@ -1,6 +1,6 @@
 import React from 'react';
 import DayCard from './DayCard';
-import { DAYS_OF_WEEK } from '../../utils/constants';
+import { DAYS_OF_WEEK } from '../utils/constants';
 
 const WeekView = ({ tasks, onDeleteTask, onEditTask }) => {
   return (

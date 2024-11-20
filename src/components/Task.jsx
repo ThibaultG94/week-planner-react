@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trash2, Edit, Clock, MessageSquare } from 'lucide-react';
-import DeleteConfirmation from '../common/DeleteConfirmation';
+import DeleteConfirmation from './common/DeleteConfirmation';
 
 const Task = ({ task, onDelete, onEdit, onStatusChange, isDragging }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

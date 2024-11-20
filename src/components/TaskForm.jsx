@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { DAYS_OF_WEEK } from '../../utils/constants';
+import { DAYS_OF_WEEK } from '../utils/constants';
 import { Plus, X, AlertCircle, Clock, Tag } from 'lucide-react';
-import { validateTask, hasErrors } from '../../utils/validation';
+import { validateTask, hasErrors } from '../utils/validation';
 
 const CATEGORIES = [
   { id: 'work', label: 'Travail', color: 'bg-blue-100 text-blue-800' },

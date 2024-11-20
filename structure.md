@@ -8,23 +8,18 @@ week-planner-react/
 │   └── react.svg         # Logo React
 ├── src/                  # Code source
 │   ├── components/       # Composants React
-│   │   ├── AppHeader/
-│   │   │   └── index.jsx
 │   │   ├── common/       # Composants réutilisables
-│   │   │   └── DeleteConfirmation/
-│   │   │       └── index.jsx
-│   │   ├── Task/        # Composant Tâche
-│   │   │   └── index.jsx
-│   │   ├── TaskForm/    # Formulaire de tâches
-│   │   │   └── index.jsx
-│   │   └── WeekView/    # Vue hebdomadaire
-│   │       ├── index.jsx
-│   │       └── DayCard.jsx
+│   │   │   └── DeleteConfirmation.jsx
+│   │   ├── AppHeader.jsx        # Header de l'application
+│   │   ├── Task.jsx             # Composant tâche individuelle
+│   │   ├── TaskForm.jsx         # Formulaire de tâches
+│   │   ├── WeekView.jsx         # Vue hebdomadaire
+│   │   └── DayCard.jsx          # Carte journalière
 │   ├── hooks/           # Custom hooks React
 │   │   └── useLocalStorage.js
 │   ├── utils/           # Utilitaires
-│   │   ├── constants.js
-│   │   └── validation.js # Nouvelles fonctions de validation
+│   │   ├── constants.js        # Constantes de l'application
+│   │   └── validation.js       # Fonctions de validation
 │   ├── App.jsx          # Composant principal
 │   ├── index.css        # Styles globaux
 │   └── main.jsx         # Point d'entrée
@@ -39,20 +34,26 @@ week-planner-react/
 └── vite.config.js      # Configuration Vite
 ```
 
-## Description des fichiers principaux
+## Description des composants
 
-### Fichiers de configuration
+### Composants principaux
 
-- `package.json`: Gestion des dépendances et scripts
-- `vite.config.js`: Configuration de Vite (bundler)
-- `tailwind.config.js`: Configuration du framework CSS
-- `postcss.config.js`: Configuration de PostCSS
-- `eslint.config.js`: Règles de linting
+- `App.jsx`: Composant racine de l'application
+- `AppHeader.jsx`: En-tête avec logo et bouton d'ajout de tâche
+- `WeekView.jsx`: Vue principale avec la grille des jours
+- `DayCard.jsx`: Carte représentant un jour et ses tâches
+- `Task.jsx`: Représentation d'une tâche individuelle
+- `TaskForm.jsx`: Formulaire de création/édition de tâche
 
-### Fichiers source principaux
+### Composants communs
 
-- `index.html`: Point d'entrée HTML
-- `src/main.jsx`: Point d'entrée JavaScript
-- `src/App.jsx`: Composant racine de l'application
-- `src/index.css`: Styles globaux et imports Tailwind
-- `src/App.css`: Styles spécifiques à App
+- `common/DeleteConfirmation.jsx`: Modal de confirmation de suppression
+
+### Hooks personnalisés
+
+- `useLocalStorage.js`: Gestion de la persistance des données
+
+### Utilitaires
+
+- `constants.js`: Constantes de l'application (jours, clés de stockage)
+- `validation.js`: Fonctions de validation des formulaires

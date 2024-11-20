@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Calendar, Plus, X } from 'lucide-react';
-import TaskForm from '../TaskForm';
+import TaskForm from './TaskForm';
 
 const AppHeader = ({ onAddTask }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
