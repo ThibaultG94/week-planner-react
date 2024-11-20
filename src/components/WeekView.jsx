@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { DragOverlay } from '@dnd-kit/core';
 import DayColumn from './DayColumn';
-import DragDropContext from './common/DragDropContext';
 import { DAYS_OF_WEEK } from '../utils/constants';
-import useDragAndDrop from '../hooks/useDragAndDrop';
+import TaskCard from './common/TaskCard';
 
 const WeekView = ({ 
   tasks, 
@@ -10,78 +11,78 @@ const WeekView = ({
   onDeleteTask, 
   onEditTask, 
   onTaskComplete,
-  onTaskMove: onTaskMoveExternal,
   onAddTask 
 }) => {
-  const [draggedTask, setDraggedTask] = useState(null);
+  const [activeTask, setActiveTask] = useState(null);
 
-  const handleTaskMove = useCallback(({ taskId, targetDay, targetPeriod }) => {
-    const taskToMove = tasks.find(t => t.id === Number(taskId));
-    if (!taskToMove) return;
+  const handleDragStart = (event) => {
+    const task = tasks.find(t => t.id === event.active.id);
+    setActiveTask(task);
+  };
 
-    const tasksInDestination = tasks.filter(
-      t => t.day === targetDay && t.period === targetPeriod
-    );
-
-    if (tasksInDestination.length >= 4) {
-      console.warn('Impossible de déplacer : période pleine');
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    
+    if (!over) {
+      setActiveTask(null);
       return;
     }
 
-    const updatedTasks = tasks.map(task => {
-      if (task.id === Number(taskId)) {
+    // Récupérer les informations du slot cible
+    const [targetDay, targetPeriod, targetPosition] = over.id.split('-');
+    
+    // Ne rien faire si on dépose au même endroit
+    const targetSlotTask = tasks.find(t => 
+      t.day === targetDay && 
+      t.period === targetPeriod && 
+      t.position === parseInt(targetPosition)
+    );
+    if (targetSlotTask && targetSlotTask.id === active.id) {
+      setActiveTask(null);
+      return;
+    }
+
+    // Récupérer la tâche à déplacer
+    const updatedTasks = tasks.map(t => {
+      // Si c'est la tâche qu'on déplace
+      if (t.id === active.id) {
         return {
-          ...task,
+          ...t,
           day: targetDay,
           period: targetPeriod,
-          position: tasksInDestination.length
+          position: parseInt(targetPosition)
         };
       }
-      return task;
+
+      // Si c'est une tâche qui était dans le slot cible, on la déplace
+      if (t.day === targetDay && 
+          t.period === targetPeriod && 
+          t.position === parseInt(targetPosition)) {
+        // Trouver une nouvelle position disponible
+        const takenPositions = tasks
+          .filter(task => task.day === targetDay && task.period === targetPeriod)
+          .map(task => task.position);
+        
+        for (let i = 0; i < 4; i++) {
+          if (!takenPositions.includes(i)) {
+            return { ...t, position: i };
+          }
+        }
+      }
+
+      return t;
     });
 
     onTaskUpdate(updatedTasks);
-    onTaskMoveExternal?.(taskId, targetDay, targetPeriod);
-  }, [tasks, onTaskUpdate, onTaskMoveExternal]);
-
-  const {
-    activeId,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd
-  } = useDragAndDrop({
-    items: tasks,
-    onMove: handleTaskMove,
-    onReorder: (newTasks, day, period) => {
-      const updatedTasks = tasks.map(task => {
-        if (task.day === day && task.period === period) {
-          const newTask = newTasks.find(t => t.id === task.id);
-          return newTask ? { ...newTask, day, period } : task;
-        }
-        return task;
-      });
-      onTaskUpdate(updatedTasks);
-    }
-  });
-
-  const handleDragStartWrapper = (event) => {
-    const task = tasks.find(t => t.id === event.active.id);
-    setDraggedTask(task);
-    handleDragStart(event);
-  };
-
-  const handleDragEndWrapper = (event) => {
-    handleDragEnd(event);
-    setDraggedTask(null);
+    setActiveTask(null);
   };
 
   return (
     <div className="h-[calc(100vh-8rem)]">
-      <DragDropContext
-        items={tasks}
-        onDragStart={handleDragStartWrapper}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEndWrapper}
+      <DndContext
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        collisionDetection={closestCenter}
       >
         <div className="grid grid-cols-7 gap-2 h-full">
           {DAYS_OF_WEEK.map((day) => (
@@ -93,24 +94,18 @@ const WeekView = ({
               onDeleteTask={onDeleteTask}
               onEditTask={onEditTask}
               onAddTask={onAddTask}
-              onTaskMove={handleTaskMove}
-              onTasksReorder={(updatedTasks) => {
-                onTaskUpdate(updatedTasks);
-              }}
-              draggedTask={draggedTask}
-              activeId={activeId}
             />
           ))}
         </div>
-      </DragDropContext>
-
-      {draggedTask && (
-        <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 z-50">
-          <p className="text-sm text-gray-600">
-            Déplacement de : <span className="font-medium">{draggedTask.title}</span>
-          </p>
-        </div>
-      )}
+        
+        <DragOverlay>
+          {activeTask ? (
+            <div className="bg-white shadow-lg rounded-md border border-blue-200 w-[200px] h-[60px]">
+              <TaskCard task={activeTask} />
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 };
