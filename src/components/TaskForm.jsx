@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { DAYS_OF_WEEK } from '../utils/constants';
-import { Plus, X, AlertCircle, Clock, Tag } from 'lucide-react';
+import { Plus, X, AlertCircle, Clock } from 'lucide-react';
 import { validateTask, hasErrors } from '../utils/validation';
 
-const CATEGORIES = [
-  { id: 'work', label: 'Travail', color: 'bg-blue-100 text-blue-800' },
-  { id: 'personal', label: 'Personnel', color: 'bg-green-100 text-green-800' },
-  { id: 'important', label: 'Important', color: 'bg-red-100 text-red-800' },
+const PERIODS = [
+  { id: 'morning-1', label: 'Matin début', time: '08:00' },
+  { id: 'morning-2', label: 'Matin fin', time: '12:00' },
+  { id: 'afternoon-1', label: 'Après-midi début', time: '14:00' },
+  { id: 'afternoon-2', label: 'Après-midi fin', time: '18:00' }
 ];
 
 const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
   const [task, setTask] = useState({
     title: '',
     day: DAYS_OF_WEEK[0],
+    startBlock: 'morning-1',  // Nouveau: bloc de début
+    endBlock: 'morning-1',    // Nouveau: bloc de fin
     note: '',
-    time: '',
-    category: '',
+    completed: false,
     id: null
   });
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -50,9 +53,10 @@ const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
       setTask({ 
         title: '', 
         day: DAYS_OF_WEEK[0], 
+        startBlock: 'morning-1',
+        endBlock: 'morning-1',
         note: '', 
-        time: '',
-        category: '',
+        completed: false,
         id: null 
       });
       
@@ -109,31 +113,44 @@ const TaskForm = ({ onSubmit, initialTask = null, onCancel }) => {
           </select>
         </div>
 
-        {/* Heure et Catégorie */}
+        {/* Période */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <div className="relative">
               <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="time"
-                value={task.time}
-                onChange={(e) => setTask({ ...task, time: e.target.value })}
+              <select
+                value={task.startBlock}
+                onChange={(e) => setTask(prev => ({
+                  ...prev,
+                  startBlock: e.target.value,
+                  endBlock: prev.endBlock < e.target.value ? e.target.value : prev.endBlock
+                }))}
                 className="pl-10 w-full px-4 py-2 rounded-md border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
-              />
+              >
+                {PERIODS.map(period => (
+                  <option key={period.id} value={period.id}>
+                    {period.label} ({period.time})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div>
             <div className="relative">
-              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <select
-                value={task.category}
-                onChange={(e) => setTask({ ...task, category: e.target.value })}
+                value={task.endBlock}
+                onChange={(e) => setTask({ ...task, endBlock: e.target.value })}
                 className="pl-10 w-full px-4 py-2 rounded-md border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
               >
-                <option value="">Catégorie</option>
-                {CATEGORIES.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.label}</option>
+                {PERIODS.filter(period => 
+                  PERIODS.findIndex(p => p.id === period.id) >= 
+                  PERIODS.findIndex(p => p.id === task.startBlock)
+                ).map(period => (
+                  <option key={period.id} value={period.id}>
+                    {period.label} ({period.time})
+                  </option>
                 ))}
               </select>
             </div>
