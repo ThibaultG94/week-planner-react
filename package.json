@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/modifiers": "^6.0.1",
+    "@dnd-kit/sortable": "^7.0.2",
+    "@dnd-kit/utilities": "^3.2.1",
     "autoprefixer": "^10.4.20",
     "lucide-react": "^0.460.0",
     "postcss": "^8.4.49",
