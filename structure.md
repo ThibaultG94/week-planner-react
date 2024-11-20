@@ -9,17 +9,22 @@ week-planner-react/
 ├── src/                  # Code source
 │   ├── components/       # Composants React
 │   │   ├── common/       # Composants réutilisables
-│   │   │   └── DeleteConfirmation.jsx
-│   │   ├── AppHeader.jsx        # Header de l'application
-│   │   ├── Task.jsx             # Composant tâche individuelle
-│   │   ├── TaskForm.jsx         # Formulaire de tâches
-│   │   ├── WeekView.jsx         # Vue hebdomadaire
-│   │   └── DayCard.jsx          # Carte journalière
+│   │   │   ├── DeleteConfirmation.jsx   # Modal de confirmation de suppression
+│   │   │   ├── TimeBlock.jsx            # Bloc pour une demi-journée
+│   │   │   └── AddTaskButton.jsx        # Bouton + pour ajouter une tâche
+│   │   ├── AppHeader.jsx        # Header avec logo et bouton nouvelle tâche
+│   │   ├── Task.jsx             # Composant tâche avec drag & drop
+│   │   ├── TaskForm.jsx         # Modal formulaire de tâches
+│   │   ├── WeekView.jsx         # Grille de la semaine
+│   │   └── DayColumn.jsx        # Colonne d'une journée avec matin/après-midi
 │   ├── hooks/           # Custom hooks React
-│   │   └── useLocalStorage.js
+│   │   ├── useLocalStorage.js         # Persistance des données
+│   │   └── useDragAndDrop.js         # Gestion du drag & drop
 │   ├── utils/           # Utilitaires
-│   │   ├── constants.js        # Constantes de l'application
-│   │   └── validation.js       # Fonctions de validation
+│   │   ├── constants.js        # Constantes (jours, storage keys)
+│   │   └── taskHelpers.js      # Fonctions pour la gestion des tâches
+│   ├── contexts/       # Contexts React
+│   │   └── TaskContext.jsx    # Gestion globale des tâches
 │   ├── App.jsx          # Composant principal
 │   ├── index.css        # Styles globaux
 │   └── main.jsx         # Point d'entrée
@@ -40,20 +45,24 @@ week-planner-react/
 
 - `App.jsx`: Composant racine de l'application
 - `AppHeader.jsx`: En-tête avec logo et bouton d'ajout de tâche
-- `WeekView.jsx`: Vue principale avec la grille des jours
-- `DayCard.jsx`: Carte représentant un jour et ses tâches
-- `Task.jsx`: Représentation d'une tâche individuelle
-- `TaskForm.jsx`: Formulaire de création/édition de tâche
+- `WeekView.jsx`: Grille principale avec les colonnes des jours
+- `DayColumn.jsx`: Colonne représentant une journée avec ses blocs matin/après-midi
+- `Task.jsx`: Représentation d'une tâche individuelle avec drag & drop
+- `TaskForm.jsx`: Modal de création/édition de tâche
 
 ### Composants communs
 
-- `common/DeleteConfirmation.jsx`: Modal de confirmation de suppression
+- `TimeBlock.jsx`: Représente un bloc de demi-journée pouvant contenir jusqu'à 4 tâches
+- `AddTaskButton.jsx`: Bouton + pour ajouter rapidement une tâche dans un bloc vide
+- `DeleteConfirmation.jsx`: Modal de confirmation de suppression
 
-### Hooks personnalisés
+### Hooks et contexts
 
 - `useLocalStorage.js`: Gestion de la persistance des données
+- `useDragAndDrop.js`: Hook personnalisé pour le drag & drop
+- `TaskContext.jsx`: Context pour la gestion globale des tâches et leur état
 
 ### Utilitaires
 
-- `constants.js`: Constantes de l'application (jours, clés de stockage)
-- `validation.js`: Fonctions de validation des formulaires
+- `constants.js`: Constantes de l'application
+- `taskHelpers.js`: Fonctions utilitaires pour la gestion des tâches
