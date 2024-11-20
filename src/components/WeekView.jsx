@@ -10,7 +10,8 @@ const WeekView = ({
   onDeleteTask, 
   onEditTask, 
   onTaskComplete,
-  onTaskMove: onTaskMoveExternal
+  onTaskMove: onTaskMoveExternal,
+  onAddTask  // S'assurer que cette prop est bien reçue
 }) => {
   const [draggedTask, setDraggedTask] = useState(null);
 
@@ -22,7 +23,6 @@ const WeekView = ({
   } = useDragAndDrop({
     items: tasks,
     onReorder: (newTasks, containerId) => {
-      // Mise à jour positions dans un même jour/période
       const [period, day] = containerId.split('-');
       const updatedTasks = tasks.map(task => {
         if (task.day !== day || task.period !== period) return task;
@@ -32,7 +32,6 @@ const WeekView = ({
       onTaskUpdate(updatedTasks);
     },
     onMove: ({ taskId, destinationContainer }) => {
-      // Déplacement entre jours/périodes
       const [newPeriod, newDay] = destinationContainer.split('-');
       const taskToMove = tasks.find(t => t.id === Number(taskId));
       
@@ -92,6 +91,7 @@ const WeekView = ({
               onTaskComplete={onTaskComplete}
               onDeleteTask={onDeleteTask}
               onEditTask={onEditTask}
+              onAddTask={onAddTask} // Passer la prop ici
               onTaskMove={(taskId, targetDay, targetPeriod) => {
                 const taskToMove = tasks.find(t => t.id === taskId);
                 if (taskToMove && targetDay && targetPeriod) {
@@ -111,7 +111,6 @@ const WeekView = ({
         </div>
       </DragDropContext>
 
-      {/* Visual feedback during dragging */}
       {draggedTask && (
         <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 z-50">
           <p className="text-sm text-gray-600">

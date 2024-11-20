@@ -7,6 +7,8 @@ import { STORAGE_KEY } from './utils/constants';
 function App() {
   const [tasks, setTasks] = useLocalStorage(STORAGE_KEY, []);
   const [editingTask, setEditingTask] = useState(null);
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState({ day: null, period: null });
   const [feedback, setFeedback] = useState({ message: '', type: '' });
 
   const showFeedback = (message, type = 'success') => {
@@ -22,10 +24,18 @@ function App() {
       setEditingTask(null);
       showFeedback('Tâche mise à jour !');
     } else {
-      setTasks(currentTasks => [...currentTasks, newTask]);
+      // S'assurer que la tâche a toutes les propriétés nécessaires
+      const completeTask = {
+        ...newTask,
+        id: Date.now(),
+        completed: false,
+        position: tasks.filter(t => t.day === newTask.day && t.period === newTask.period).length
+      };
+      setTasks(currentTasks => [...currentTasks, completeTask]);
       showFeedback('Nouvelle tâche ajoutée !');
     }
-  }, [editingTask, setTasks]);
+    setIsTaskFormOpen(false);
+  }, [editingTask, setTasks, tasks]);
 
   const handleDeleteTask = useCallback((taskId) => {
     setTasks(currentTasks => currentTasks.filter(task => task.id !== taskId));
@@ -34,11 +44,8 @@ function App() {
 
   const handleEditTask = useCallback((task) => {
     setEditingTask(task);
+    setIsTaskFormOpen(true);
   }, []);
-
-  const handleTasksReorder = useCallback((updatedTasks) => {
-    setTasks(updatedTasks);
-  }, [setTasks]);
 
   const handleTaskComplete = useCallback((taskId) => {
     setTasks(currentTasks =>
@@ -62,12 +69,28 @@ function App() {
     showFeedback('Tâche déplacée !');
   }, [setTasks]);
 
+  // Nouveau gestionnaire pour ouvrir le formulaire depuis les blocs
+  const handleOpenTaskForm = useCallback((day, period) => {
+    setSelectedPeriod({ day, period });
+    setIsTaskFormOpen(true);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <AppHeader 
         onAddTask={handleAddTask}
         editingTask={editingTask}
         onEditComplete={() => setEditingTask(null)}
+        isFormOpen={isTaskFormOpen}
+        onFormOpen={() => {
+          setSelectedPeriod({ day: null, period: null });
+          setIsTaskFormOpen(true);
+        }}
+        onFormClose={() => {
+          setIsTaskFormOpen(false);
+          setEditingTask(null);
+        }}
+        selectedPeriod={selectedPeriod}
       />
 
       {feedback.message && (
@@ -85,7 +108,7 @@ function App() {
           onEditTask={handleEditTask}
           onTaskComplete={handleTaskComplete}
           onTaskMove={handleTaskMove}
-          onTasksReorder={handleTasksReorder}
+          onAddTask={handleOpenTaskForm} // Nouvelle prop pour ouvrir le formulaire
         />
       </main>
     </div>

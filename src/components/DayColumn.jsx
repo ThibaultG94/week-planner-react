@@ -5,8 +5,8 @@ import useDragAndDrop from '../hooks/useDragAndDrop';
 
 const DayColumn = ({ 
   day, 
-  tasks, 
-  onAddTask, 
+  tasks,
+  onAddTask, // S'assurer que cette prop est bien reçue
   onTaskComplete, 
   onTasksReorder,
   onDeleteTask,
@@ -29,7 +29,6 @@ const DayColumn = ({
     };
   }, [tasks]);
 
-  // Configuration du drag & drop pour la colonne
   const {
     activeId,
     handleDragStart,
@@ -37,30 +36,25 @@ const DayColumn = ({
     handleDragEnd
   } = useDragAndDrop({
     items: tasks,
-    onReorder: (newItems, containerId) => {
-      // Mise à jour des positions après réorganisation
-      const updatedItems = newItems.map((item, index) => ({
-        ...item,
-        position: index
-      }));
-      onTasksReorder(updatedItems);
-    },
+    onReorder: onTasksReorder,
     onMove: ({ taskId, destinationContainer }) => {
       const [newPeriod] = destinationContainer.split('-');
       onTaskMove(taskId, day, newPeriod);
     }
   });
 
+  // Gestionnaires pour chaque période
+  const handleMorningAddTask = () => onAddTask(day, 'morning');
+  const handleAfternoonAddTask = () => onAddTask(day, 'afternoon');
+
   return (
     <div className={`h-full flex flex-col border ${
       isToday ? 'border-blue-400' : 'border-gray-200'
     } bg-white`}>
-      {/* En-tête */}
       <div className="h-8 flex items-center px-2 border-b">
         <h2 className="font-medium text-sm text-gray-700">{day}</h2>
       </div>
 
-      {/* Container pour Matin/Après-midi avec contexte DnD */}
       <DragDropContext
         items={tasks}
         onDragStart={handleDragStart}
@@ -68,7 +62,6 @@ const DayColumn = ({
         onDragEnd={handleDragEnd}
       >
         <div className="flex-1 grid grid-rows-2 divide-y">
-          {/* Morning Block */}
           <div className="relative h-full">
             <div className="absolute -top-0 left-2 z-10">
               <span className="text-xs font-medium text-gray-500">Matin</span>
@@ -76,7 +69,7 @@ const DayColumn = ({
             <TimeBlock
               period="morning"
               tasks={morningTasks}
-              onAddTask={() => onAddTask(day, 'morning')}
+              onAddTask={handleMorningAddTask}
               containerId={`morning-${day}`}
               onTaskComplete={onTaskComplete}
               onDeleteTask={onDeleteTask}
@@ -86,7 +79,6 @@ const DayColumn = ({
             />
           </div>
           
-          {/* Afternoon Block */}
           <div className="relative h-full">
             <div className="absolute -top-0 left-2 z-10">
               <span className="text-xs font-medium text-gray-500">Après-midi</span>
@@ -94,7 +86,7 @@ const DayColumn = ({
             <TimeBlock
               period="afternoon"
               tasks={afternoonTasks}
-              onAddTask={() => onAddTask(day, 'afternoon')}
+              onAddTask={handleAfternoonAddTask}
               containerId={`afternoon-${day}`}
               onTaskComplete={onTaskComplete}
               onDeleteTask={onDeleteTask}

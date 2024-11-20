@@ -1,10 +1,14 @@
-import { useState } from 'react';
 import { Calendar, Plus, X } from 'lucide-react';
 import TaskForm from './TaskForm';
 
-const AppHeader = ({ onAddTask }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+const AppHeader = ({ 
+  onAddTask, 
+  editingTask,
+  isFormOpen,
+  onFormOpen,
+  onFormClose,
+  selectedPeriod 
+}) => {
   return (
     <>
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
@@ -15,7 +19,7 @@ const AppHeader = ({ onAddTask }) => {
               <h1 className="text-lg font-semibold text-gray-900">WeekPlanner</h1>
             </div>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={onFormOpen}
               className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               <Plus size={16} className="mr-1" />
@@ -26,13 +30,15 @@ const AppHeader = ({ onAddTask }) => {
       </header>
 
       {/* Modal pour le formulaire */}
-      {isModalOpen && (
+      {isFormOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">Nouvelle tâche</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {editingTask ? 'Modifier la tâche' : 'Nouvelle tâche'}
+              </h2>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={onFormClose}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <X size={20} />
@@ -41,10 +47,17 @@ const AppHeader = ({ onAddTask }) => {
             <div className="p-4">
               <TaskForm
                 onSubmit={async (task) => {
-                  await onAddTask(task);
-                  setIsModalOpen(false);
+                  await onAddTask({
+                    ...task,
+                    day: selectedPeriod.day || task.day,
+                    period: selectedPeriod.period || task.period,
+                  });
+                  onFormClose();
                 }}
-                onCancel={() => setIsModalOpen(false)}
+                initialTask={editingTask}
+                onCancel={onFormClose}
+                preselectedDay={selectedPeriod.day}
+                preselectedPeriod={selectedPeriod.period}
               />
             </div>
           </div>
