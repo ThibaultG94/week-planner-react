@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import DayColumn from './DayColumn';
 import { DAYS_OF_WEEK } from '../utils/constants';
 
-const WeekView = ({ tasks, onTaskUpdate, onDeleteTask, onEditTask }) => {
+const WeekView = ({ 
+  tasks, 
+  onTaskUpdate, 
+  onDeleteTask, 
+  onEditTask, 
+  onTaskComplete 
+}) => {
   const [draggedTaskId, setDraggedTaskId] = useState(null);
 
   const handleTaskDrop = (e, targetDay, period) => {
@@ -12,7 +18,15 @@ const WeekView = ({ tasks, onTaskUpdate, onDeleteTask, onEditTask }) => {
 
     const updatedTasks = tasks.map(task => {
       if (task.id === parseInt(taskId)) {
-        return { ...task, day: targetDay, period };
+        // Calcul de la nouvelle position en fin de liste
+        const targetTasks = tasks.filter(t => t.day === targetDay && t.period === period);
+        const newPosition = targetTasks.length;
+        return { 
+          ...task, 
+          day: targetDay, 
+          period: period,
+          position: newPosition 
+        };
       }
       return task;
     });
@@ -21,22 +35,31 @@ const WeekView = ({ tasks, onTaskUpdate, onDeleteTask, onEditTask }) => {
     setDraggedTaskId(null);
   };
 
+  const handleTasksReorder = (updatedTasks) => {
+    // Mise à jour des positions pour tout le groupe de tâches
+    const tasksWithPositions = updatedTasks.map((task, index) => ({
+      ...task,
+      position: index
+    }));
+    onTaskUpdate(tasksWithPositions);
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-h-screen">
+    <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
       {DAYS_OF_WEEK.map((day) => (
         <DayColumn 
           key={day} 
           day={day}
           tasks={tasks.filter(task => task.day === day)}
           onTaskDrop={handleTaskDrop}
-          onDragStart={(task) => setDraggedTaskId(task.id)}
-          onDragEnd={() => setDraggedTaskId(null)}
+          onTasksReorder={handleTasksReorder}
           onDeleteTask={onDeleteTask}
           onEditTask={onEditTask}
+          onTaskComplete={onTaskComplete}
         />
       ))}
     </div>
   );
 };
 
-export default WeekView;
+export default React.memo(WeekView);
