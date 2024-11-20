@@ -1,34 +1,24 @@
 import { Plus } from 'lucide-react';
-import Task from '../Task';
+import TaskCard from './TaskCard';
 
 const TimeBlock = ({ 
   period, 
   tasks = [], 
-  onAddTask, 
-  onDrop, 
+  onAddTask,
+  containerId,
   onTaskComplete,
   onDeleteTask,
   onEditTask,
+  activeId,
   maxTasks = 4 
 }) => {
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const draggedTaskId = e.dataTransfer.getData('text/plain');
-    if (!draggedTaskId) return;
-    onDrop?.(e, draggedTaskId);
-  };
-
   // Structure de base : 4 emplacements
-  const slots = Array(4).fill(null).map((_, index) => {
+  const slots = Array(maxTasks).fill(null).map((_, index) => {
     return tasks[index] || null;
   });
 
   return (
-    <div 
-      className="h-full pt-7"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={handleDrop}
-    >
+    <div className="h-full pt-7">
       {/* Grille de 4 emplacements */}
       <div className="h-full grid grid-rows-4 gap-1">
         {slots.map((task, index) => (
@@ -38,14 +28,16 @@ const TimeBlock = ({
               !task ? 'border-2 border-dashed border-gray-200' : ''
             }`}
           >
-            {/* Tâche existante */}
+            {/* Tâche existante avec drag & drop */}
             {task && (
               <div className="absolute inset-0">
-                <Task 
+                <TaskCard
                   task={task}
                   onComplete={onTaskComplete}
                   onDelete={onDeleteTask}
                   onEdit={onEditTask}
+                  containerId={containerId}
+                  isDragging={task.id === activeId}
                 />
               </div>
             )}
@@ -59,6 +51,11 @@ const TimeBlock = ({
                 <Plus size={14} className="mr-1" />
                 <span className="text-xs">Ajouter une tâche</span>
               </button>
+            )}
+
+            {/* Indicateur de zone de drop */}
+            {activeId && !task && (
+              <div className="absolute inset-0 rounded border-2 border-blue-400 border-dashed opacity-50" />
             )}
           </div>
         ))}

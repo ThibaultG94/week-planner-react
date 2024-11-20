@@ -1,15 +1,17 @@
 import { useMemo } from 'react';
 import TimeBlock from './common/TimeBlock';
+import DragDropContext from './common/DragDropContext';
+import useDragAndDrop from '../hooks/useDragAndDrop';
 
 const DayColumn = ({ 
   day, 
   tasks, 
   onAddTask, 
-  onTaskDrop, 
   onTaskComplete, 
   onTasksReorder,
   onDeleteTask,
-  onEditTask 
+  onEditTask,
+  onTaskMove 
 }) => {
   const isToday = useMemo(() => {
     const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long' })
@@ -27,6 +29,28 @@ const DayColumn = ({
     };
   }, [tasks]);
 
+  // Configuration du drag & drop pour la colonne
+  const {
+    activeId,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd
+  } = useDragAndDrop({
+    items: tasks,
+    onReorder: (newItems, containerId) => {
+      // Mise à jour des positions après réorganisation
+      const updatedItems = newItems.map((item, index) => ({
+        ...item,
+        position: index
+      }));
+      onTasksReorder(updatedItems);
+    },
+    onMove: ({ taskId, destinationContainer }) => {
+      const [newPeriod] = destinationContainer.split('-');
+      onTaskMove(taskId, day, newPeriod);
+    }
+  });
+
   return (
     <div className={`h-full flex flex-col border ${
       isToday ? 'border-blue-400' : 'border-gray-200'
@@ -36,42 +60,51 @@ const DayColumn = ({
         <h2 className="font-medium text-sm text-gray-700">{day}</h2>
       </div>
 
-      {/* Container pour Matin/Après-midi */}
-      <div className="flex-1 grid grid-rows-2 divide-y">
-        <div className="relative h-full">
-          <div className="absolute -top-0 left-2 z-10">
-            <span className="text-xs font-medium text-gray-500">Matin</span>
+      {/* Container pour Matin/Après-midi avec contexte DnD */}
+      <DragDropContext
+        items={tasks}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex-1 grid grid-rows-2 divide-y">
+          {/* Morning Block */}
+          <div className="relative h-full">
+            <div className="absolute -top-0 left-2 z-10">
+              <span className="text-xs font-medium text-gray-500">Matin</span>
+            </div>
+            <TimeBlock
+              period="morning"
+              tasks={morningTasks}
+              onAddTask={() => onAddTask(day, 'morning')}
+              containerId={`morning-${day}`}
+              onTaskComplete={onTaskComplete}
+              onDeleteTask={onDeleteTask}
+              onEditTask={onEditTask}
+              activeId={activeId}
+              maxTasks={4}
+            />
           </div>
-          <TimeBlock
-            period="morning"
-            tasks={morningTasks}
-            onAddTask={() => onAddTask(day, 'morning')}
-            onDrop={(e) => onTaskDrop(e, day, 'morning')}
-            onTaskComplete={onTaskComplete}
-            onReorder={onTasksReorder}
-            onDeleteTask={onDeleteTask}
-            onEditTask={onEditTask}
-            maxTasks={4}
-          />
-        </div>
-        
-        <div className="relative h-full">
-          <div className="absolute -top-0 left-2 z-10">
-            <span className="text-xs font-medium text-gray-500">Après-midi</span>
+          
+          {/* Afternoon Block */}
+          <div className="relative h-full">
+            <div className="absolute -top-0 left-2 z-10">
+              <span className="text-xs font-medium text-gray-500">Après-midi</span>
+            </div>
+            <TimeBlock
+              period="afternoon"
+              tasks={afternoonTasks}
+              onAddTask={() => onAddTask(day, 'afternoon')}
+              containerId={`afternoon-${day}`}
+              onTaskComplete={onTaskComplete}
+              onDeleteTask={onDeleteTask}
+              onEditTask={onEditTask}
+              activeId={activeId}
+              maxTasks={4}
+            />
           </div>
-          <TimeBlock
-            period="afternoon"
-            tasks={afternoonTasks}
-            onAddTask={() => onAddTask(day, 'afternoon')}
-            onDrop={(e) => onTaskDrop(e, day, 'afternoon')}
-            onTaskComplete={onTaskComplete}
-            onReorder={onTasksReorder}
-            onDeleteTask={onDeleteTask}
-            onEditTask={onEditTask}
-            maxTasks={4}
-          />
         </div>
-      </div>
+      </DragDropContext>
     </div>
   );
 };
