@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import TimeBlock from './common/TimeBlock';
-import { Calendar } from 'lucide-react';
 
 const DayColumn = ({ 
   day, 
@@ -28,59 +27,50 @@ const DayColumn = ({
     };
   }, [tasks]);
 
-  const handleReorder = (period, reorderedTasks) => {
-    // Mise à jour des positions lors du réordonnancement
-    const updatedTasks = reorderedTasks.map((task, index) => ({
-      ...task,
-      position: index
-    }));
-    
-    const otherTasks = tasks.filter(task => task.period !== period);
-    onTasksReorder([...otherTasks, ...updatedTasks]);
-  };
-
   return (
-    <div 
-      className={`flex flex-col h-full rounded-lg border ${
-        isToday ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200'
-      } bg-white transition-shadow hover:shadow-md`}
-    >
-      {/* En-tête de la colonne */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="font-semibold text-gray-700">{day}</h2>
-        {isToday && (
-          <span className="flex items-center text-xs text-blue-600">
-            <Calendar size={14} className="mr-1" />
-            Aujourd'hui
-          </span>
-        )}
+    <div className={`h-full flex flex-col border ${
+      isToday ? 'border-blue-400' : 'border-gray-200'
+    } bg-white`}>
+      {/* En-tête */}
+      <div className="h-8 flex items-center px-2 border-b">
+        <h2 className="font-medium text-sm text-gray-700">{day}</h2>
       </div>
 
-      {/* Contenu de la colonne */}
-      <div className="flex-1 space-y-4 p-4 bg-gray-50">
-        <TimeBlock
-          period="Matin"
-          tasks={morningTasks}
-          onAddTask={() => onAddTask(day, 'morning')}
-          onDrop={(e) => onTaskDrop(e, day, 'morning')}
-          onTaskComplete={onTaskComplete}
-          onReorder={(tasks) => handleReorder('morning', tasks)}
-          onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
-          maxTasks={4}
-        />
+      {/* Container pour Matin/Après-midi */}
+      <div className="flex-1 grid grid-rows-2 divide-y">
+        <div className="relative">
+          <div className="absolute inset-x-0 top-1.5 px-2">
+            <span className="text-xs font-medium text-gray-500">Matin</span>
+          </div>
+          <TimeBlock
+            period="morning"
+            tasks={morningTasks}
+            onAddTask={() => onAddTask(day, 'morning')}
+            onDrop={(e) => onTaskDrop(e, day, 'morning')}
+            onTaskComplete={onTaskComplete}
+            onReorder={onTasksReorder}
+            onDeleteTask={onDeleteTask}
+            onEditTask={onEditTask}
+            maxTasks={4}
+          />
+        </div>
         
-        <TimeBlock
-          period="Après-midi"
-          tasks={afternoonTasks}
-          onAddTask={() => onAddTask(day, 'afternoon')}
-          onDrop={(e) => onTaskDrop(e, day, 'afternoon')}
-          onTaskComplete={onTaskComplete}
-          onReorder={(tasks) => handleReorder('afternoon', tasks)}
-          onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
-          maxTasks={4}
-        />
+        <div className="relative">
+          <div className="absolute inset-x-0 top-1.5 px-2">
+            <span className="text-xs font-medium text-gray-500">Après-midi</span>
+          </div>
+          <TimeBlock
+            period="afternoon"
+            tasks={afternoonTasks}
+            onAddTask={() => onAddTask(day, 'afternoon')}
+            onDrop={(e) => onTaskDrop(e, day, 'afternoon')}
+            onTaskComplete={onTaskComplete}
+            onReorder={onTasksReorder}
+            onDeleteTask={onDeleteTask}
+            onEditTask={onEditTask}
+            maxTasks={4}
+          />
+        </div>
       </div>
     </div>
   );
