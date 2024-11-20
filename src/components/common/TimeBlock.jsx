@@ -19,12 +19,12 @@ const TimeBlock = ({
 
   return (
     <div className="h-full pt-7">
-      {/* Grille de 4 emplacements */}
+      {/* Grille de 4 emplacements avec hauteur adaptative */}
       <div className="h-full grid grid-rows-4 gap-1">
         {slots.map((task, index) => (
           <div 
             key={index} 
-            className={`relative rounded ${
+            className={`relative h-full min-h-[60px] rounded ${
               !task ? 'border-2 border-dashed border-gray-200' : ''
             }`}
           >

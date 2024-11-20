@@ -1,29 +1,32 @@
 import { useState, useCallback } from "react";
-import { arrayMove } from "@dnd-kit/sortable";
 
-const useDragAndDrop = ({ items, onReorder, onMove }) => {
+const useDragAndDrop = ({ onMove }) => {
   const [activeId, setActiveId] = useState(null);
-  const [initialContainer, setInitialContainer] = useState(null);
+  const [activeTask, setActiveTask] = useState(null);
 
   const handleDragStart = useCallback(({ active }) => {
     setActiveId(active.id);
-    setInitialContainer(active.data.current?.sortable?.containerId);
+    setActiveTask(active.data.current?.task);
   }, []);
 
   const handleDragOver = useCallback(
     ({ active, over }) => {
       if (!over) return;
 
-      const activeContainer = active.data.current?.sortable?.containerId;
-      const overContainer = over.data.current?.sortable?.containerId;
+      const activeContainer = active.data.current?.containerId;
+      const overContainer = over.data.current?.containerId;
 
       if (activeContainer !== overContainer) {
-        onMove?.({
-          taskId: active.id,
-          sourceContainer: activeContainer,
-          destinationContainer: overContainer,
-          overItemId: over.id,
-        });
+        const [targetPeriod, targetDay] = overContainer?.split("-") || [];
+
+        if (targetDay && targetPeriod) {
+          onMove({
+            taskId: active.id,
+            targetDay,
+            targetPeriod,
+            position: over.data.current?.position || 0,
+          });
+        }
       }
     },
     [onMove]
@@ -33,39 +36,34 @@ const useDragAndDrop = ({ items, onReorder, onMove }) => {
     ({ active, over }) => {
       if (!over) {
         setActiveId(null);
+        setActiveTask(null);
         return;
       }
 
-      const activeContainer = active.data.current?.sortable?.containerId;
-      const overContainer = over.data.current?.sortable?.containerId;
-
-      if (activeContainer === overContainer) {
-        // Réorganisation dans le même conteneur
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        if (oldIndex !== newIndex) {
-          const newItems = arrayMove(items, oldIndex, newIndex);
-          onReorder?.(newItems, activeContainer);
-        }
-      } else {
-        // Déplacement vers un autre conteneur
-        onMove?.({
-          taskId: active.id,
-          sourceContainer: initialContainer,
-          destinationContainer: overContainer,
-          overItemId: over.id,
-        });
+      const overContainer = over.data.current?.containerId;
+      if (!overContainer) {
+        setActiveId(null);
+        setActiveTask(null);
+        return;
       }
 
+      const [targetPeriod, targetDay] = overContainer.split("-");
+      onMove({
+        taskId: active.id,
+        targetDay,
+        targetPeriod,
+        position: over.data.current?.position || 0,
+      });
+
       setActiveId(null);
-      setInitialContainer(null);
+      setActiveTask(null);
     },
-    [items, onReorder, onMove, initialContainer]
+    [onMove]
   );
 
   return {
     activeId,
+    activeTask,
     handleDragStart,
     handleDragOver,
     handleDragEnd,

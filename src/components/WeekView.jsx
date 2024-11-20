@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import DayColumn from './DayColumn';
 import DragDropContext from './common/DragDropContext';
 import { DAYS_OF_WEEK } from '../utils/constants';
@@ -11,9 +11,38 @@ const WeekView = ({
   onEditTask, 
   onTaskComplete,
   onTaskMove: onTaskMoveExternal,
-  onAddTask  // S'assurer que cette prop est bien reçue
+  onAddTask 
 }) => {
   const [draggedTask, setDraggedTask] = useState(null);
+
+  const handleTaskMove = useCallback(({ taskId, targetDay, targetPeriod }) => {
+    const taskToMove = tasks.find(t => t.id === Number(taskId));
+    if (!taskToMove) return;
+
+    const tasksInDestination = tasks.filter(
+      t => t.day === targetDay && t.period === targetPeriod
+    );
+
+    if (tasksInDestination.length >= 4) {
+      console.warn('Impossible de déplacer : période pleine');
+      return;
+    }
+
+    const updatedTasks = tasks.map(task => {
+      if (task.id === Number(taskId)) {
+        return {
+          ...task,
+          day: targetDay,
+          period: targetPeriod,
+          position: tasksInDestination.length
+        };
+      }
+      return task;
+    });
+
+    onTaskUpdate(updatedTasks);
+    onTaskMoveExternal?.(taskId, targetDay, targetPeriod);
+  }, [tasks, onTaskUpdate, onTaskMoveExternal]);
 
   const {
     activeId,
@@ -22,44 +51,16 @@ const WeekView = ({
     handleDragEnd
   } = useDragAndDrop({
     items: tasks,
-    onReorder: (newTasks, containerId) => {
-      const [period, day] = containerId.split('-');
+    onMove: handleTaskMove,
+    onReorder: (newTasks, day, period) => {
       const updatedTasks = tasks.map(task => {
-        if (task.day !== day || task.period !== period) return task;
-        const newTask = newTasks.find(t => t.id === task.id);
-        return newTask || task;
+        if (task.day === day && task.period === period) {
+          const newTask = newTasks.find(t => t.id === task.id);
+          return newTask ? { ...newTask, day, period } : task;
+        }
+        return task;
       });
       onTaskUpdate(updatedTasks);
-    },
-    onMove: ({ taskId, destinationContainer }) => {
-      const [newPeriod, newDay] = destinationContainer.split('-');
-      const taskToMove = tasks.find(t => t.id === Number(taskId));
-      
-      if (taskToMove) {
-        const tasksInDestination = tasks.filter(
-          t => t.day === newDay && t.period === newPeriod
-        );
-
-        if (tasksInDestination.length >= 4) {
-          console.warn('Impossible de déplacer : période pleine');
-          return;
-        }
-
-        const updatedTasks = tasks.map(task => {
-          if (task.id === Number(taskId)) {
-            return {
-              ...task,
-              day: newDay,
-              period: newPeriod,
-              position: tasksInDestination.length
-            };
-          }
-          return task;
-        });
-
-        onTaskUpdate(updatedTasks);
-        onTaskMoveExternal?.(taskId, newDay, newPeriod);
-      }
     }
   });
 
@@ -91,18 +92,10 @@ const WeekView = ({
               onTaskComplete={onTaskComplete}
               onDeleteTask={onDeleteTask}
               onEditTask={onEditTask}
-              onAddTask={onAddTask} // Passer la prop ici
-              onTaskMove={(taskId, targetDay, targetPeriod) => {
-                const taskToMove = tasks.find(t => t.id === taskId);
-                if (taskToMove && targetDay && targetPeriod) {
-                  onTaskMoveExternal?.(taskId, targetDay, targetPeriod);
-                }
-              }}
+              onAddTask={onAddTask}
+              onTaskMove={handleTaskMove}
               onTasksReorder={(updatedTasks) => {
-                onTaskUpdate(tasks.map(task => {
-                  const updatedTask = updatedTasks.find(t => t.id === task.id);
-                  return updatedTask || task;
-                }));
+                onTaskUpdate(updatedTasks);
               }}
               draggedTask={draggedTask}
               activeId={activeId}

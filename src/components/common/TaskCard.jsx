@@ -32,6 +32,7 @@ const TaskCard = ({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging || isSortableDragging ? 0.5 : 1,
+    height: '100%', // S'adapte à la hauteur du conteneur parent
   };
 
   return (
@@ -39,13 +40,11 @@ const TaskCard = ({
       <div
         ref={setNodeRef}
         style={style}
-        className={`group relative flex flex-col bg-white rounded-md border border-gray-200 p-3 
-          ${isDragging ? 'shadow-lg ring-2 ring-blue-400' : 'hover:shadow-sm'}
-          transition-all duration-200`}
+        className="group relative flex flex-col h-full bg-white rounded-md border border-gray-200 p-3 hover:shadow-sm transition-all duration-200"
         {...attributes}
         {...listeners}
       >
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 h-full">
           <input
             type="checkbox"
             checked={task.completed}
@@ -53,24 +52,22 @@ const TaskCard = ({
             className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           
-          <div className="flex-1">
-            <div className="flex flex-col">
-              <h3 className={`text-sm font-medium ${
-                task.completed ? 'text-gray-400 line-through' : 'text-gray-900'
-              }`}>
-                {task.title}
-              </h3>
-              
-              {task.note && (
-                <button
-                  onClick={() => {}} // Toggle notes visibility
-                  className="mt-1 flex items-center text-xs text-gray-500 hover:text-gray-700"
-                >
-                  <MessageSquare size={12} className="mr-1" />
-                  Notes
-                </button>
-              )}
-            </div>
+          <div className="flex-1 flex flex-col h-full">
+            <h3 className={`text-sm font-medium ${
+              task.completed ? 'text-gray-400 line-through' : 'text-gray-900'
+            }`}>
+              {task.title}
+            </h3>
+            
+            {task.note && (
+              <button
+                onClick={() => {}} // Toggle notes visibility
+                className="mt-1 flex items-center text-xs text-gray-500 hover:text-gray-700"
+              >
+                <MessageSquare size={12} className="mr-1" />
+                Notes
+              </button>
+            )}
           </div>
 
           {/* Actions */}
