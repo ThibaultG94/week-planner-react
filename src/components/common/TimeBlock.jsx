@@ -25,7 +25,7 @@ const TimeBlock = ({
 
   return (
     <div 
-      className="h-full pt-6"
+      className="h-full pt-7"
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >

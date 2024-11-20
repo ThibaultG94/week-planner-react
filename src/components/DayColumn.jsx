@@ -38,8 +38,8 @@ const DayColumn = ({
 
       {/* Container pour Matin/Après-midi */}
       <div className="flex-1 grid grid-rows-2 divide-y">
-        <div className="relative">
-          <div className="absolute inset-x-0 top-1.5 px-2">
+        <div className="relative h-full">
+          <div className="absolute -top-0 left-2 z-10">
             <span className="text-xs font-medium text-gray-500">Matin</span>
           </div>
           <TimeBlock
@@ -55,8 +55,8 @@ const DayColumn = ({
           />
         </div>
         
-        <div className="relative">
-          <div className="absolute inset-x-0 top-1.5 px-2">
+        <div className="relative h-full">
+          <div className="absolute -top-0 left-2 z-10">
             <span className="text-xs font-medium text-gray-500">Après-midi</span>
           </div>
           <TimeBlock
