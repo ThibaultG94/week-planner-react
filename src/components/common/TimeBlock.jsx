@@ -30,11 +30,17 @@ const TimeBlock = ({
       onDrop={handleDrop}
     >
       {/* Grille de 4 emplacements */}
-      <div className="h-full grid grid-rows-4 gap-0.5">
+      <div className="h-full grid grid-rows-4 gap-1">
         {slots.map((task, index) => (
-          <div key={index} className="relative bg-gray-50">
-            {task ? (
-              <div className="absolute inset-0 px-1">
+          <div 
+            key={index} 
+            className={`relative rounded ${
+              !task ? 'border-2 border-dashed border-gray-200' : ''
+            }`}
+          >
+            {/* Tâche existante */}
+            {task && (
+              <div className="absolute inset-0">
                 <Task 
                   task={task}
                   onComplete={onTaskComplete}
@@ -42,16 +48,17 @@ const TimeBlock = ({
                   onEdit={onEditTask}
                 />
               </div>
-            ) : (
-              tasks.length === 0 && index === 0 && (
-                <button
-                  onClick={onAddTask}
-                  className="absolute inset-0 flex items-center justify-center text-gray-400 hover:text-blue-500 hover:bg-gray-100/50 transition-colors"
-                >
-                  <Plus size={14} className="mr-1" />
-                  <span className="text-xs">Ajouter une tâche</span>
-                </button>
-              )
+            )}
+            
+            {/* Overlay "Ajouter une tâche" sur les emplacements vides */}
+            {!task && (
+              <button
+                onClick={() => onAddTask(period, index)}
+                className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 text-gray-400 hover:text-blue-500 hover:bg-gray-50/80 rounded transition-all duration-200"
+              >
+                <Plus size={14} className="mr-1" />
+                <span className="text-xs">Ajouter une tâche</span>
+              </button>
             )}
           </div>
         ))}
