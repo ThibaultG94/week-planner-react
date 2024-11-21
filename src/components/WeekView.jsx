@@ -8,7 +8,7 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import { DAYS_OF_WEEK } from '../utils/constants';
 import { useTaskContext } from '../contexts/TaskContext';
 import DayColumn from './DayColumn';
@@ -84,14 +84,31 @@ const WeekView = ({ onAddTask }) => {
     }
   };
 
+  // Création d'un modificateur personnalisé qui restreint le mouvement horizontal
+  const customModifier = (args) => {
+    // Restreindre horizontalement pour éviter le dépassement de la fenêtre
+    const horizontallyRestricted = restrictToHorizontalAxis(args);
+    
+    // Limiter la distance maximale de déplacement horizontal
+    const maxHorizontalDistance = window.innerWidth - 100; // Marge de sécurité
+    const x = Math.min(Math.max(horizontallyRestricted.x, -maxHorizontalDistance), maxHorizontalDistance);
+    
+    return {
+      ...horizontallyRestricted,
+      x,
+      // Garder le y tel quel pour permettre le scroll vertical
+      y: args.transform.y
+    };
+  };
+
   return (
-    <div className="h-[calc(100vh-8rem)] overflow-hidden">
+    <div className="h-full">
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         collisionDetection={closestCenter}
-        modifiers={[restrictToWindowEdges]}
+        modifiers={[customModifier]}
       >
         <div className="grid grid-cols-7 gap-2 h-full">
           {DAYS_OF_WEEK.map((day) => (

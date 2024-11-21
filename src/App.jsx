@@ -7,7 +7,6 @@ function App() {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState({ day: null, period: null });
 
-  // Nouveau gestionnaire pour ouvrir le formulaire depuis les blocs
   const handleOpenTaskForm = (day, period) => {
     setSelectedPeriod({ day, period });
     setIsTaskFormOpen(true);
@@ -15,7 +14,7 @@ function App() {
 
   return (
     <TaskProvider>
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="flex flex-col h-screen">
         <AppHeader 
           isFormOpen={isTaskFormOpen}
           onFormOpen={() => {
@@ -26,10 +25,13 @@ function App() {
             setIsTaskFormOpen(false);
           }}
           selectedPeriod={selectedPeriod}
+          className="flex-shrink-0" // Empêche l'header de rétrécir
         />
 
-        <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <WeekView onAddTask={handleOpenTaskForm} />
+        <main className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-50 to-gray-100">
+          <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-full">
+            <WeekView onAddTask={handleOpenTaskForm} />
+          </div>
         </main>
       </div>
     </TaskProvider>
