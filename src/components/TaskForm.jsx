@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DAYS_OF_WEEK } from '../utils/constants';
+import { Plus, X, AlertCircle } from 'lucide-react';
 import { validateTask, hasErrors } from '../utils/validation';
 
 const TaskForm = ({ 
@@ -18,14 +19,14 @@ const TaskForm = ({
     id: null
   });
 
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     if (initialTask) {
       setTask(initialTask);
     }
   }, [initialTask]);
-
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,12 +39,7 @@ const TaskForm = ({
 
     setIsSubmitting(true);
     try {
-      await onSubmit({
-        ...task,
-        id: task.id || Date.now(),
-        period: task.period || preselectedPeriod || 'morning',
-        day: task.day || preselectedDay || DAYS_OF_WEEK[0]
-      });
+      await onSubmit(task);
     } finally {
       setIsSubmitting(false);
     }
@@ -115,7 +111,7 @@ const TaskForm = ({
           }`}
           disabled={isSubmitting}
         >
-          {task.id ? 'Modifier' : 'Ajouter'}
+          {isSubmitting ? 'En cours...' : 'Ajouter'}
         </button>
       </div>
     </form>

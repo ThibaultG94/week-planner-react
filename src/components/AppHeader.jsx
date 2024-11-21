@@ -1,14 +1,15 @@
 import { Calendar, Plus, X } from 'lucide-react';
 import TaskForm from './TaskForm';
+import { useTaskContext } from '../contexts/TaskContext';
 
 const AppHeader = ({ 
-  onAddTask, 
-  editingTask,
   isFormOpen,
   onFormOpen,
   onFormClose,
   selectedPeriod 
 }) => {
+  const { addTask } = useTaskContext();
+
   return (
     <>
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
@@ -35,7 +36,7 @@ const AppHeader = ({
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900">
-                {editingTask ? 'Modifier la tâche' : 'Nouvelle tâche'}
+                Nouvelle tâche
               </h2>
               <button
                 onClick={onFormClose}
@@ -46,15 +47,14 @@ const AppHeader = ({
             </div>
             <div className="p-4">
               <TaskForm
-                onSubmit={async (task) => {
-                  await onAddTask({
-                    ...task,
-                    day: selectedPeriod.day || task.day,
-                    period: selectedPeriod.period || task.period,
+                onSubmit={async (taskData) => {
+                  await addTask({
+                    ...taskData,
+                    day: selectedPeriod.day || taskData.day,
+                    period: selectedPeriod.period || taskData.period,
                   });
                   onFormClose();
                 }}
-                initialTask={editingTask}
                 onCancel={onFormClose}
                 preselectedDay={selectedPeriod.day}
                 preselectedPeriod={selectedPeriod.period}
