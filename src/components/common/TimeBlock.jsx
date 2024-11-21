@@ -10,6 +10,8 @@ const TimeBlock = ({
   onTaskComplete,
   onDeleteTask,
   onEditTask,
+  onTaskMove,
+  onTasksReorder,
   activeId,
   maxTasks = 4 
 }) => {
@@ -17,7 +19,6 @@ const TimeBlock = ({
   const slots = useMemo(() => {
     const emptySlots = Array(maxTasks).fill(null)
       .map((_, index) => ({
-        // L'ID suit maintenant le format : day-period-position
         id: `${day}-${period}-${index}`,
         position: index,
         task: null
@@ -35,7 +36,7 @@ const TimeBlock = ({
 
   // Setup de la zone de drop pour toute la période
   const { setNodeRef, isOver } = useDroppable({
-    id: `${day}-${period}`, // Identifiant unique pour la période
+    id: `${day}-${period}`,
     data: {
       type: 'period',
       period,
@@ -44,28 +45,39 @@ const TimeBlock = ({
   });
 
   return (
-    <div 
-      ref={setNodeRef}
-      className={`h-full pt-7 transition-colors ${
-        isOver ? 'bg-blue-50' : ''
-      }`}
-    >
-      <div className="h-full grid grid-rows-4 gap-1 p-2">
-        {slots.map((slot) => (
-          <DroppableSlot
-            key={slot.id}
-            id={slot.id}
-            day={day}
-            period={period}
-            position={slot.position}
-            task={slot.task}
-            onAddTask={() => onAddTask(day, period)}
-            onTaskComplete={onTaskComplete}
-            onDeleteTask={onDeleteTask}
-            onEditTask={onEditTask}
-            isActive={activeId === slot.task?.id}
-          />
-        ))}
+    <div className="relative h-full">
+      {/* Label de la période */}
+      <div className="absolute -top-0 left-2 z-10">
+        <span className="text-xs font-medium text-gray-500">
+          {period === 'morning' ? 'Matin' : 'Après-midi'}
+        </span>
+      </div>
+      
+      <div 
+        ref={setNodeRef}
+        className={`h-full pt-7 transition-colors ${
+          isOver ? 'bg-blue-50' : ''
+        }`}
+      >
+        <div className="h-full grid grid-rows-4 gap-1 p-2">
+          {slots.map((slot) => (
+            <DroppableSlot
+              key={slot.id}
+              id={slot.id}
+              day={day}
+              period={period}
+              position={slot.position}
+              task={slot.task}
+              onAddTask={() => onAddTask(day, period)}
+              onTaskComplete={onTaskComplete}
+              onDeleteTask={onDeleteTask}
+              onEditTask={onEditTask}
+              onTaskMove={onTaskMove}
+              onTasksReorder={onTasksReorder}
+              isActive={activeId === slot.task?.id}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -35,30 +35,30 @@ const TaskCard = ({
       {...listeners}
       {...attributes}
     >
-      <div className="flex items-start gap-2 h-full">
+      <div className="flex items-start gap-2 h-full max-h-[60px]">
         <input
           type="checkbox"
           checked={task.completed}
           onChange={() => onComplete(task.id)}
-          className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600"
+          className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 shrink-0"
         />
           
-        <div className="flex-1 flex flex-col min-w-0">
-          <h3 className={`text-sm font-medium truncate ${
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <h3 className={`text-sm font-medium max-h-[40px] overflow-hidden ${
             task.completed ? 'text-gray-400 line-through' : 'text-gray-900'
           }`}>
             {task.title}
           </h3>
             
           {task.note && (
-            <div className="mt-1 flex items-center text-xs text-gray-500">
+            <div className="mt-auto flex items-center text-xs text-gray-500">
               <MessageSquare size={12} className="shrink-0 mr-1" />
               <span className="truncate">Notes</span>
             </div>
           )}
         </div>
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-1 shrink-0">
           <button
             onClick={() => onEdit(task)}
             className="p-1 text-gray-400 hover:text-blue-500"

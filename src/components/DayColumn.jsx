@@ -1,17 +1,16 @@
 import { useMemo } from 'react';
 import TimeBlock from './common/TimeBlock';
-import { DndContext, useDroppable } from '@dnd-kit/core';
-import useDragAndDrop from '../hooks/useDragAndDrop';
 
 const DayColumn = ({ 
   day, 
   tasks,
   onAddTask,
   onTaskComplete, 
-  onTasksReorder,
   onDeleteTask,
   onEditTask,
-  onTaskMove 
+  onTaskMove,  // Ajout de la prop manquante
+  onTasksReorder,  // Ajout de la prop manquante
+  activeId
 }) => {
   // Détecter si c'est aujourd'hui
   const isToday = useMemo(() => {
@@ -31,41 +30,6 @@ const DayColumn = ({
     };
   }, [tasks]);
 
-  // Setup du drag & drop
-  const {
-    activeId,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd
-  } = useDragAndDrop({
-    tasks,
-    onTasksReorder,
-    onTaskMove
-  });
-
-  // Setup des zones de drop pour la colonne
-  const { setNodeRef: setMorningRef } = useDroppable({
-    id: `morning-${day}`,
-    data: {
-      type: 'period',
-      period: 'morning',
-      day
-    }
-  });
-
-  const { setNodeRef: setAfternoonRef } = useDroppable({
-    id: `afternoon-${day}`,
-    data: {
-      type: 'period',
-      period: 'afternoon',
-      day
-    }
-  });
-
-  // Gestionnaires pour chaque période
-  const handleMorningAddTask = () => onAddTask(day, 'morning');
-  const handleAfternoonAddTask = () => onAddTask(day, 'afternoon');
-
   return (
     <div className={`h-full flex flex-col border ${
       isToday ? 'border-blue-400' : 'border-gray-200'
@@ -79,50 +43,35 @@ const DayColumn = ({
         </h2>
       </div>
 
-      {/* Conteneur pour le drag & drop */}
-      <DndContext
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex-1 grid grid-rows-2 divide-y">
-          {/* Période du matin */}
-          <div ref={setMorningRef} className="relative h-full">
-            <div className="absolute -top-0 left-2 z-10">
-              <span className="text-xs font-medium text-gray-500">Matin</span>
-            </div>
-            <TimeBlock
-              period="morning"
-              day={day}
-              tasks={morningTasks}
-              onAddTask={handleMorningAddTask}
-              onTaskComplete={onTaskComplete}
-              onDeleteTask={onDeleteTask}
-              onEditTask={onEditTask}
-              activeId={activeId}
-              maxTasks={4}
-            />
-          </div>
-          
-          {/* Période de l'après-midi */}
-          <div ref={setAfternoonRef} className="relative h-full">
-            <div className="absolute -top-0 left-2 z-10">
-              <span className="text-xs font-medium text-gray-500">Après-midi</span>
-            </div>
-            <TimeBlock
-              period="afternoon"
-              day={day}
-              tasks={afternoonTasks}
-              onAddTask={handleAfternoonAddTask}
-              onTaskComplete={onTaskComplete}
-              onDeleteTask={onDeleteTask}
-              onEditTask={onEditTask}
-              activeId={activeId}
-              maxTasks={4}
-            />
-          </div>
-        </div>
-      </DndContext>
+      <div className="flex-1 grid grid-rows-2 divide-y">
+        <TimeBlock
+          period="morning"
+          day={day}
+          tasks={morningTasks}
+          onAddTask={onAddTask}
+          onTaskComplete={onTaskComplete}
+          onDeleteTask={onDeleteTask}
+          onEditTask={onEditTask}
+          onTaskMove={onTaskMove}  // Passage de la prop
+          onTasksReorder={onTasksReorder}  // Passage de la prop
+          activeId={activeId}
+          maxTasks={4}
+        />
+        
+        <TimeBlock
+          period="afternoon"
+          day={day}
+          tasks={afternoonTasks}
+          onAddTask={onAddTask}
+          onTaskComplete={onTaskComplete}
+          onDeleteTask={onDeleteTask}
+          onEditTask={onEditTask}
+          onTaskMove={onTaskMove}  // Passage de la prop
+          onTasksReorder={onTasksReorder}  // Passage de la prop
+          activeId={activeId}
+          maxTasks={4}
+        />
+      </div>
     </div>
   );
 };
