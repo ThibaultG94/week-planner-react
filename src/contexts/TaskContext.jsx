@@ -6,10 +6,9 @@ const TaskContext = createContext(null);
 
 export function TaskProvider({ children }) {
   const [tasks, setTasks] = useLocalStorage(STORAGE_KEY, []);
-  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  
-  // Gestion des tâches
+
   const addTask = useCallback((newTask) => {
     const completeTask = {
       ...newTask,
@@ -18,22 +17,24 @@ export function TaskProvider({ children }) {
       position: tasks.filter(t => t.day === newTask.day && t.period === newTask.period).length
     };
     setTasks(currentTasks => [...currentTasks, completeTask]);
-    setIsTaskFormOpen(false);
+    setIsFormOpen(false);
+    setEditingTask(null);
   }, [setTasks, tasks]);
 
   const editTask = useCallback((task) => {
-    console.log('editTask', task);
+    console.log('Editing task:', task);
     setEditingTask(task);
-    setIsTaskFormOpen(true);
+    setIsFormOpen(true);
   }, []);
 
   const updateTask = useCallback((taskId, updates) => {
+    console.log('Updating task:', taskId, updates);
     setTasks(currentTasks =>
       currentTasks.map(task =>
         task.id === taskId ? { ...task, ...updates } : task
       )
     );
-    setIsTaskFormOpen(false);
+    setIsFormOpen(false);
     setEditingTask(null);
   }, [setTasks]);
 
@@ -83,20 +84,20 @@ export function TaskProvider({ children }) {
   }, [setTasks]);
 
   // Gestion du formulaire
-  const openTaskForm = useCallback((day = null, period = null) => {
+  const openTaskForm = useCallback(() => {
     setEditingTask(null);
-    setIsTaskFormOpen(true);
+    setIsFormOpen(true);
   }, []);
 
   const closeTaskForm = useCallback(() => {
-    setIsTaskFormOpen(false);
+    setIsFormOpen(false);
     setEditingTask(null);
   }, []);
 
   const value = {
     // État
     tasks,
-    isTaskFormOpen,
+    isFormOpen,
     editingTask,
     
     // Actions tâches

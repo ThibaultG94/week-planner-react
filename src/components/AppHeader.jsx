@@ -2,13 +2,15 @@ import { Calendar, Plus, X } from 'lucide-react';
 import TaskForm from './TaskForm';
 import { useTaskContext } from '../contexts/TaskContext';
 
-const AppHeader = ({ 
-  isFormOpen,
-  onFormOpen,
-  onFormClose,
-  selectedPeriod 
-}) => {
-  const { addTask } = useTaskContext();
+const AppHeader = () => {
+  const { 
+    isFormOpen, 
+    openTaskForm, 
+    closeTaskForm, 
+    addTask, 
+    updateTask,
+    editingTask 
+  } = useTaskContext();
 
   return (
     <>
@@ -20,7 +22,7 @@ const AppHeader = ({
               <h1 className="text-lg font-semibold text-gray-900">WeekPlanner</h1>
             </div>
             <button
-              onClick={onFormOpen}
+              onClick={openTaskForm}
               className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               <Plus size={16} className="mr-1" />
@@ -30,16 +32,15 @@ const AppHeader = ({
         </div>
       </header>
 
-      {/* Modal pour le formulaire */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900">
-                Nouvelle tâche
+                {editingTask ? 'Modifier la tâche' : 'Nouvelle tâche'}
               </h2>
               <button
-                onClick={onFormClose}
+                onClick={closeTaskForm}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <X size={20} />
@@ -47,17 +48,16 @@ const AppHeader = ({
             </div>
             <div className="p-4">
               <TaskForm
+                initialTask={editingTask}
                 onSubmit={async (taskData) => {
-                  await addTask({
-                    ...taskData,
-                    day: selectedPeriod.day || taskData.day,
-                    period: selectedPeriod.period || taskData.period,
-                  });
-                  onFormClose();
+                  if (editingTask) {
+                    await updateTask(editingTask.id, taskData);
+                  } else {
+                    await addTask(taskData);
+                  }
+                  closeTaskForm();
                 }}
-                onCancel={onFormClose}
-                preselectedDay={selectedPeriod.day}
-                preselectedPeriod={selectedPeriod.period}
+                onCancel={closeTaskForm}
               />
             </div>
           </div>

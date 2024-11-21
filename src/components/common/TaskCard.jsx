@@ -36,13 +36,6 @@ const TaskCard = ({ task }) => {
     editTask(task);
   };
 
-  const handleDelete = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Delete clicked');
-    setShowDeleteConfirm(true);
-  };
-
   const handleComplete = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -118,7 +111,7 @@ const TaskCard = ({ task }) => {
               </button>
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 onMouseDown={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}
                 className="p-1 text-gray-400 hover:text-red-500 z-50 cursor-pointer"
