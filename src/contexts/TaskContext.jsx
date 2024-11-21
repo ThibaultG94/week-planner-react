@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback } from 'react';
+import { createContext, useContext, useCallback, useState } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { STORAGE_KEY } from '../utils/constants';
 
@@ -6,7 +6,10 @@ const TaskContext = createContext(null);
 
 export function TaskProvider({ children }) {
   const [tasks, setTasks] = useLocalStorage(STORAGE_KEY, []);
-
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  
+  // Gestion des tâches
   const addTask = useCallback((newTask) => {
     const completeTask = {
       ...newTask,
@@ -15,7 +18,14 @@ export function TaskProvider({ children }) {
       position: tasks.filter(t => t.day === newTask.day && t.period === newTask.period).length
     };
     setTasks(currentTasks => [...currentTasks, completeTask]);
+    setIsTaskFormOpen(false);
   }, [setTasks, tasks]);
+
+  const editTask = useCallback((task) => {
+    console.log('editTask', task);
+    setEditingTask(task);
+    setIsTaskFormOpen(true);
+  }, []);
 
   const updateTask = useCallback((taskId, updates) => {
     setTasks(currentTasks =>
@@ -23,10 +33,26 @@ export function TaskProvider({ children }) {
         task.id === taskId ? { ...task, ...updates } : task
       )
     );
+    setIsTaskFormOpen(false);
+    setEditingTask(null);
   }, [setTasks]);
 
   const deleteTask = useCallback((taskId) => {
-    setTasks(currentTasks => currentTasks.filter(task => task.id !== taskId));
+    setTasks(currentTasks => {
+      const updatedTasks = currentTasks.filter(task => task.id !== taskId);
+      // Réorganiser les positions des tâches restantes
+      const taskToDelete = currentTasks.find(t => t.id === taskId);
+      if (taskToDelete) {
+        const samePeriodTasks = updatedTasks
+          .filter(t => t.day === taskToDelete.day && t.period === taskToDelete.period)
+          .sort((a, b) => a.position - b.position);
+        
+        samePeriodTasks.forEach((task, index) => {
+          task.position = index;
+        });
+      }
+      return updatedTasks;
+    });
   }, [setTasks]);
 
   const toggleTaskComplete = useCallback((taskId) => {
@@ -56,27 +82,34 @@ export function TaskProvider({ children }) {
     });
   }, [setTasks]);
 
-  const reorderTasks = useCallback((updatedTasks) => {
-    setTasks(currentTasks => {
-      const newTasks = [...currentTasks];
-      updatedTasks.forEach(update => {
-        const index = newTasks.findIndex(task => task.id === update.id);
-        if (index !== -1) {
-          newTasks[index] = { ...newTasks[index], ...update };
-        }
-      });
-      return newTasks;
-    });
-  }, [setTasks]);
+  // Gestion du formulaire
+  const openTaskForm = useCallback((day = null, period = null) => {
+    setEditingTask(null);
+    setIsTaskFormOpen(true);
+  }, []);
+
+  const closeTaskForm = useCallback(() => {
+    setIsTaskFormOpen(false);
+    setEditingTask(null);
+  }, []);
 
   const value = {
+    // État
     tasks,
+    isTaskFormOpen,
+    editingTask,
+    
+    // Actions tâches
     addTask,
+    editTask,
     updateTask,
     deleteTask,
     toggleTaskComplete,
     moveTask,
-    reorderTasks
+    
+    // Actions formulaire
+    openTaskForm,
+    closeTaskForm
   };
 
   return (

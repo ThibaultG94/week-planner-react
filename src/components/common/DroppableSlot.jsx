@@ -10,9 +10,6 @@ const DroppableSlot = ({
   position,
   task,
   onAddTask,
-  onTaskComplete,
-  onDeleteTask,
-  onEditTask,
   isActive
 }) => {
   // Créer l'ID dans le bon ordre : jour-période-position
@@ -39,12 +36,7 @@ const DroppableSlot = ({
     >
       {task && (
         <div className="absolute inset-0">
-          <TaskCard
-            task={task}
-            onComplete={onTaskComplete}
-            onDelete={onDeleteTask}
-            onEdit={onEditTask}
-          />
+          <TaskCard task={task}/>
         </div>
       )}
 

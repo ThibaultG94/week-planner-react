@@ -7,9 +7,6 @@ const TimeBlock = ({
   period, 
   tasks = [], 
   onAddTask,
-  onTaskComplete,
-  onDeleteTask,
-  onEditTask,
   onTaskMove,
   onTasksReorder,
   activeId,
@@ -69,9 +66,6 @@ const TimeBlock = ({
               position={slot.position}
               task={slot.task}
               onAddTask={() => onAddTask(day, period)}
-              onTaskComplete={onTaskComplete}
-              onDeleteTask={onDeleteTask}
-              onEditTask={onEditTask}
               onTaskMove={onTaskMove}
               onTasksReorder={onTasksReorder}
               isActive={activeId === slot.task?.id}
