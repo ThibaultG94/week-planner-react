@@ -8,8 +8,8 @@ const DayColumn = ({
   onTaskComplete, 
   onDeleteTask,
   onEditTask,
-  onTaskMove,  // Ajout de la prop manquante
-  onTasksReorder,  // Ajout de la prop manquante
+  onTaskMove,  
+  onTasksReorder,  
   activeId
 }) => {
   // Détecter si c'est aujourd'hui

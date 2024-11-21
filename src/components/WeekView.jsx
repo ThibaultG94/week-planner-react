@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DndContext, closestCenter, pointerWithin } from '@dnd-kit/core';
+import { DndContext, closestCenter } from '@dnd-kit/core';
 import { DAYS_OF_WEEK } from '../utils/constants';
 import DayColumn from './DayColumn';
 

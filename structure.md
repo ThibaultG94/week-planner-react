@@ -12,7 +12,6 @@ week-planner-react/
 │   │   │   ├── DeleteConfirmation.jsx   # Modal de confirmation de suppression
 │   │   │   ├── DroppableSlot.jsx        # Conteneur unique pour une tâche avec drop zone
 │   │   │   ├── TimeBlock.jsx            # Bloc pour une demi-journée
-│   │   │   ├── AddTaskButton.jsx        # Bouton + pour ajouter une tâche
 │   │   │   ├── TaskCard.jsx             # Carte de tâche draggable
 │   │   │   └── AnimatedTransition.jsx   # Composant pour les transitions fluides
 │   │   ├── AppHeader.jsx        # Header avec logo et bouton nouvelle tâche
@@ -29,8 +28,6 @@ week-planner-react/
 │   │   ├── validation.js        # Validation des formulaires
 │   │   ├── timeBlocks.js        # Gestion des blocs horaires
 │   │   └── dragAndDrop.js       # Helpers pour le drag & drop
-│   ├── contexts/       # Contexts React
-│   │   └── TaskContext.jsx    # Gestion globale des tâches
 │   ├── App.jsx          # Composant principal
 │   ├── index.css        # Styles globaux
 │   └── main.jsx         # Point d'entrée
@@ -40,16 +37,29 @@ week-planner-react/
 ├── package.json        # Configuration du projet
 ├── postcss.config.js   # Configuration PostCSS
 ├── README.md           # Documentation
-├── structure.md        # Structure du projet actualisée
 ├── tailwind.config.js  # Configuration Tailwind
 └── vite.config.js      # Configuration Vite
+```
+
+## Hiérarchie des composants
+
+```
+App
+├── AppHeader
+│   └── TaskForm
+└── WeekView
+    └── DayColumn
+        └── TimeBlock
+            └── DroppableSlot
+                └── TaskCard
+                    └── DeleteConfirmation
 ```
 
 ## Description des composants
 
 ### Composants principaux
 
-- `App.jsx`: Composant racine de l'application
+- `App.jsx`: Composant racine gérant l'état global et les fonctions principales
 - `AppHeader.jsx`: En-tête avec logo et bouton d'ajout de tâche
 - `WeekView.jsx`: Grille principale avec les colonnes des jours
 - `DayColumn.jsx`: Colonne représentant une journée avec ses blocs matin/après-midi
@@ -62,19 +72,10 @@ week-planner-react/
 - `TaskCard.jsx`: Représentation draggable d'une tâche
 - `DeleteConfirmation.jsx`: Modal de confirmation de suppression
 - `AnimatedTransition.jsx`: Composant pour les animations de transition
-- `AddTaskButton.jsx`: Bouton d'ajout rapide de tâche
 
-### Hooks et contexts
+### Hooks et utilitaires
 
 - `useLocalStorage.js`: Gestion de la persistance des données
 - `useDragAndDrop.js`: Hook personnalisé pour le drag & drop avec dnd-kit
 - `useTaskPositioning.js`: Hook pour gérer les positions des tâches dans les slots
 - `useViewMode.js`: Hook pour gérer les modes d'affichage
-- `TaskContext.jsx`: Context pour la gestion globale des tâches
-
-### Utilitaires
-
-- `constants.js`: Constantes de l'application
-- `validation.js`: Validation des formulaires
-- `timeBlocks.js`: Logique des blocs horaires
-- `dragAndDrop.js`: Utilitaires pour le drag & drop
