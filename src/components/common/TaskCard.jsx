@@ -28,14 +28,6 @@ const TaskCard = ({ task }) => {
     touchAction: 'none',
   } : { touchAction: 'none' };
 
-  // Handlers séparés pour les boutons
-  const handleEdit = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Edit clicked');
-    editTask(task);
-  };
-
   const handleComplete = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -64,14 +56,18 @@ const TaskCard = ({ task }) => {
       >
         <div className="flex items-start gap-2 h-full max-h-[60px]">
           {/* Zone de la checkbox qui ne déclenche pas le drag */}
-          <div onClick={(e) => e.stopPropagation()}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             <input
               type="checkbox"
               id={`task-${task.id}-checkbox`}
               name={`task-${task.id}-checkbox`}
               checked={task.completed}
               onChange={handleComplete}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 shrink-0"
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 shrink-0 cursor-pointer"
             />
           </div>
           
@@ -102,7 +98,7 @@ const TaskCard = ({ task }) => {
             <div className="relative flex gap-1">
               <button
                 type="button"
-                onClick={handleEdit}
+                onClick={() => editTask(task)}
                 onMouseDown={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}
                 className="p-1 text-gray-400 hover:text-blue-500 z-50 cursor-pointer"

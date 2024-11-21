@@ -1,19 +1,19 @@
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
+import { useTaskContext } from '../../contexts/TaskContext';
 import TaskCard from './TaskCard';
 
 const DroppableSlot = ({
-  id,
   day,
   period,
   position,
   task,
-  onAddTask,
   isActive
 }) => {
   // Créer l'ID dans le bon ordre : jour-période-position
   const slotId = `${day}-${period}-${position}`;
+  const { openTaskForm } = useTaskContext();
   
   const { setNodeRef, isOver } = useDroppable({
     id: slotId,
@@ -26,6 +26,10 @@ const DroppableSlot = ({
     }
   });
 
+  const handleAddTask = () => {
+    openTaskForm(day, period);
+  };
+
   return (
     <div 
       ref={setNodeRef}
@@ -36,13 +40,13 @@ const DroppableSlot = ({
     >
       {task && (
         <div className="absolute inset-0">
-          <TaskCard task={task}/>
+          <TaskCard task={task} />
         </div>
       )}
 
       {!task && !isOver && (
         <button
-          onClick={onAddTask}
+          onClick={handleAddTask}
           className="absolute inset-0 flex items-center justify-center opacity-0 
             hover:opacity-100 text-gray-400 hover:text-blue-500 
             hover:bg-gray-50/80 rounded-md transition-all duration-200"
