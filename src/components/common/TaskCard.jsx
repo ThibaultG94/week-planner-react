@@ -28,10 +28,8 @@ const TaskCard = ({ task }) => {
     touchAction: 'none',
   } : { touchAction: 'none' };
 
-  const handleComplete = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Complete clicked');
+  const handleComplete = () => {
+    console.log('Toggle complete for task:', task.id, 'Current state:', task.completed);
     toggleTaskComplete(task.id);
   };
 
@@ -60,6 +58,7 @@ const TaskCard = ({ task }) => {
             onClick={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
+            className="relative"
           >
             <input
               type="checkbox"
@@ -69,11 +68,13 @@ const TaskCard = ({ task }) => {
               onChange={handleComplete}
               className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 shrink-0 cursor-pointer"
             />
+            {/* Overlay invisible pour augmenter la zone cliquable */}
+            <div className="absolute inset-0 w-6 h-6 -m-1 cursor-pointer" onClick={handleComplete} />
           </div>
           
           {/* Contenu */}
           <div className="flex-1 flex flex-col min-w-0">
-            <h3 className={`text-sm font-medium line-clamp-2 w-full ${
+            <h3 className={`text-sm font-medium line-clamp-2 w-full transition-all duration-200 ${
               task.completed ? 'text-gray-400 line-through' : 'text-gray-900'
             }`}>
               {task.title}
