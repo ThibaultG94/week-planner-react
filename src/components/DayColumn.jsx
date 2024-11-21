@@ -5,11 +5,6 @@ const DayColumn = ({
   day, 
   tasks,
   onAddTask,
-  onTaskComplete, 
-  onDeleteTask,
-  onEditTask,
-  onTaskMove,  
-  onTasksReorder,  
   activeId
 }) => {
   // Détecter si c'est aujourd'hui
@@ -34,7 +29,6 @@ const DayColumn = ({
     <div className={`h-full flex flex-col border ${
       isToday ? 'border-blue-400' : 'border-gray-200'
     } bg-white rounded-lg shadow-sm`}>
-      {/* En-tête de la colonne */}
       <div className="h-8 flex items-center px-3 py-6 border-b">
         <h2 className={`font-medium ${
           isToday ? 'text-blue-600' : 'text-gray-700'
@@ -49,11 +43,6 @@ const DayColumn = ({
           day={day}
           tasks={morningTasks}
           onAddTask={onAddTask}
-          onTaskComplete={onTaskComplete}
-          onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
-          onTaskMove={onTaskMove}  // Passage de la prop
-          onTasksReorder={onTasksReorder}  // Passage de la prop
           activeId={activeId}
           maxTasks={4}
         />
@@ -63,11 +52,6 @@ const DayColumn = ({
           day={day}
           tasks={afternoonTasks}
           onAddTask={onAddTask}
-          onTaskComplete={onTaskComplete}
-          onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
-          onTaskMove={onTaskMove}  // Passage de la prop
-          onTasksReorder={onTasksReorder}  // Passage de la prop
           activeId={activeId}
           maxTasks={4}
         />

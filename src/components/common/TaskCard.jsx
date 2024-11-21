@@ -2,15 +2,12 @@ import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { Trash2, Edit, MessageSquare } from 'lucide-react';
+import { useTaskContext } from '../../contexts/TaskContext';
 import DeleteConfirmation from './DeleteConfirmation';
 
-const TaskCard = ({ 
-  task, 
-  onDelete, 
-  onEdit, 
-  onComplete,
-}) => {
+const TaskCard = ({ task }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { deleteTask, toggleTaskComplete, updateTask } = useTaskContext();
   
   const {
     attributes,
@@ -40,13 +37,14 @@ const TaskCard = ({
   const handleEdit = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    onEdit(task);
+    // Déclencher l'ouverture du modal d'édition via le context
+    updateTask(task.id, { isEditing: true });
   };
 
   const handleComplete = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    onComplete(task.id);
+    toggleTaskComplete(task.id);
   };
 
   if (isDragging) {
@@ -117,7 +115,7 @@ const TaskCard = ({
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={() => {
-          onDelete(task.id);
+          deleteTask(task.id);
           setShowDeleteConfirm(false);
         }}
         taskTitle={task.title}

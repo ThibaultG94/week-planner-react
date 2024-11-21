@@ -3,38 +3,43 @@
 ```
 week-planner-react/
 ├── node_modules/          # Dépendances du projet
-├── public/
-│   ├── vite.svg          # Logo Vite
-│   └── react.svg         # Logo React
+├── public/               # Ressources publiques
+│   ├── react.svg         # Logo React
+│   └── vite.svg          # Logo Vite
 ├── src/                  # Code source
 │   ├── components/       # Composants React
 │   │   ├── common/       # Composants réutilisables
-│   │   │   ├── DeleteConfirmation.jsx   # Modal de confirmation de suppression
-│   │   │   ├── DroppableSlot.jsx        # Conteneur unique pour une tâche avec drop zone
-│   │   │   ├── TimeBlock.jsx            # Bloc pour une demi-journée
-│   │   │   ├── TaskCard.jsx             # Carte de tâche draggable
-│   │   │   └── AnimatedTransition.jsx   # Composant pour les transitions fluides
-│   │   ├── AppHeader.jsx        # Header avec logo et bouton nouvelle tâche
-│   │   ├── TaskForm.jsx         # Modal formulaire de tâches
-│   │   ├── WeekView.jsx         # Grille de la semaine
-│   │   └── DayColumn.jsx        # Colonne d'une journée avec matin/après-midi
-│   ├── hooks/           # Custom hooks React
-│   │   ├── useLocalStorage.js         # Persistance des données
-│   │   ├── useDragAndDrop.js         # Gestion du drag & drop avec dnd-kit
-│   │   ├── useTaskPositioning.js      # Gestion des positions des tâches dans les slots
-│   │   └── useViewMode.js            # Gestion des modes d'affichage
+│   │   │   ├── AnimatedTransition.jsx   # Animation des transitions
+│   │   │   ├── DeleteConfirmation.jsx   # Modal de confirmation
+│   │   │   ├── DroppableSlot.jsx        # Zone de drop pour les tâches
+│   │   │   ├── TaskCard.jsx             # Carte de tâche
+│   │   │   └── TimeBlock.jsx            # Bloc horaire (matin/après-midi)
+│   │   ├── AppHeader.jsx        # En-tête de l'application
+│   │   ├── DayColumn.jsx        # Colonne d'un jour
+│   │   ├── TaskForm.jsx         # Formulaire de tâche
+│   │   └── WeekView.jsx         # Vue de la semaine
+│   ├── contexts/        # Contexts React
+│   │   ├── TaskContext.jsx           # Gestion globale des tâches
+│   │   └── ViewModeContext.jsx       # Gestion du mode d'affichage
+│   ├── hooks/           # Custom hooks
+│   │   ├── useDragAndDrop.js         # Logique de drag & drop
+│   │   ├── useLocalStorage.js        # Persistence locale
+│   │   ├── useTaskPositioning.js     # Positionnement des tâches
+│   │   └── useViewMode.js            # Mode d'affichage
 │   ├── utils/           # Utilitaires
-│   │   ├── constants.js         # Constantes (jours, storage keys)
-│   │   ├── validation.js        # Validation des formulaires
-│   │   ├── timeBlocks.js        # Gestion des blocs horaires
-│   │   └── dragAndDrop.js       # Helpers pour le drag & drop
-│   ├── App.jsx          # Composant principal
+│   │   ├── animations.js       # Animations
+│   │   ├── constants.js        # Constantes
+│   │   ├── taskHelpers.js      # Helpers pour les tâches
+│   │   ├── timeBlocks.js       # Gestion des blocs horaires
+│   │   └── validation.js       # Validation des données
+│   ├── App.jsx          # Composant racine
 │   ├── index.css        # Styles globaux
 │   └── main.jsx         # Point d'entrée
-├── .gitignore          # Fichiers à ignorer par Git
+├── .gitignore          # Configuration Git
+├── dnt-kit.md          # Documentation dnd-kit
 ├── eslint.config.js    # Configuration ESLint
-├── index.html          # Page HTML principale
-├── package.json        # Configuration du projet
+├── index.html          # HTML principal
+├── package.json        # Configuration npm
 ├── postcss.config.js   # Configuration PostCSS
 ├── README.md           # Documentation
 ├── tailwind.config.js  # Configuration Tailwind
