@@ -58,11 +58,12 @@ function App() {
     showFeedback('Statut de la tâche mis à jour !');
   }, [setTasks]);
 
-  const handleTaskMove = useCallback((taskId, targetDay, targetPeriod) => {
+  // Nouvelle fonction pour mettre à jour une tâche
+  const handleTaskUpdate = useCallback((taskId, updates) => {
     setTasks(currentTasks =>
       currentTasks.map(task =>
         task.id === taskId
-          ? { ...task, day: targetDay, period: targetPeriod }
+          ? { ...task, ...updates }
           : task
       )
     );
@@ -107,8 +108,8 @@ function App() {
           onDeleteTask={handleDeleteTask}
           onEditTask={handleEditTask}
           onTaskComplete={handleTaskComplete}
-          onTaskMove={handleTaskMove}
-          onAddTask={handleOpenTaskForm} // Nouvelle prop pour ouvrir le formulaire
+          onTaskUpdate={handleTaskUpdate}  // Ajout de la prop onTaskUpdate
+          onAddTask={handleOpenTaskForm}
         />
       </main>
     </div>

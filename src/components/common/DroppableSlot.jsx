@@ -7,21 +7,21 @@ const DroppableSlot = ({
   id,
   day,
   period,
-  index,
+  position,
   task,
   onAddTask,
   onTaskComplete,
   onDeleteTask,
   onEditTask,
-  isOver
+  isActive
 }) => {
-  const { setNodeRef, isOver: isSlotOver } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id,
     data: {
       type: 'slot',
       day,
       period,
-      index,
+      position,
       accepts: ['task']
     }
   });
@@ -29,27 +29,30 @@ const DroppableSlot = ({
   return (
     <div 
       ref={setNodeRef}
-      className={`relative h-[60px] rounded border-2 ${
-        !task 
-          ? 'border-dashed border-gray-200' 
-          : 'border-transparent'
-      } ${isSlotOver ? 'bg-blue-50 border-blue-200' : ''}`}
+      className={`relative h-full min-h-[60px] rounded-md transition-all duration-200
+        ${!task ? 'border-2 border-dashed border-gray-200' : ''}
+        ${isOver ? 'bg-blue-50 border-blue-200' : ''}
+        ${isActive ? 'opacity-50' : ''}`}
     >
       {task && (
-        <TaskCard
-          task={task}
-          onComplete={onTaskComplete}
-          onDelete={onDeleteTask}
-          onEdit={onEditTask}
-        />
+        <div className="absolute inset-0">
+          <TaskCard
+            task={task}
+            onComplete={onTaskComplete}
+            onDelete={onDeleteTask}
+            onEdit={onEditTask}
+          />
+        </div>
       )}
 
       {!task && !isOver && (
         <button
           onClick={onAddTask}
-          className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 text-gray-400 hover:text-blue-500 hover:bg-gray-50/80 rounded transition-all duration-200"
+          className="absolute inset-0 flex items-center justify-center opacity-0 
+            hover:opacity-100 text-gray-400 hover:text-blue-500 
+            hover:bg-gray-50/80 rounded-md transition-all duration-200"
         >
-          <Plus size={14} className="mr-1" />
+          <Plus size={16} className="mr-1" />
           <span className="text-xs">Ajouter une tâche</span>
         </button>
       )}

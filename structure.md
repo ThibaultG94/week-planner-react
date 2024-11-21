@@ -68,7 +68,7 @@ week-planner-react/
 
 - `useLocalStorage.js`: Gestion de la persistance des données
 - `useDragAndDrop.js`: Hook personnalisé pour le drag & drop avec dnd-kit
-- `useTaskPositioning.js`: Hook pour gérer les positions des tâches
+- `useTaskPositioning.js`: Hook pour gérer les positions des tâches dans les slots
 - `useViewMode.js`: Hook pour gérer les modes d'affichage
 - `TaskContext.jsx`: Context pour la gestion globale des tâches
 

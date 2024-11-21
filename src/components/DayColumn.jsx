@@ -1,18 +1,19 @@
 import { useMemo } from 'react';
 import TimeBlock from './common/TimeBlock';
-import DragDropContext from './common/DragDropContext';
+import { DndContext, useDroppable } from '@dnd-kit/core';
 import useDragAndDrop from '../hooks/useDragAndDrop';
 
 const DayColumn = ({ 
   day, 
   tasks,
-  onAddTask, // S'assurer que cette prop est bien reçue
+  onAddTask,
   onTaskComplete, 
   onTasksReorder,
   onDeleteTask,
   onEditTask,
   onTaskMove 
 }) => {
+  // Détecter si c'est aujourd'hui
   const isToday = useMemo(() => {
     const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long' })
       .charAt(0).toUpperCase() + 
@@ -20,6 +21,7 @@ const DayColumn = ({
     return today === day;
   }, [day]);
 
+  // Trier les tâches par période
   const { morningTasks, afternoonTasks } = useMemo(() => {
     return {
       morningTasks: tasks.filter(task => task.period === 'morning')
@@ -29,17 +31,34 @@ const DayColumn = ({
     };
   }, [tasks]);
 
+  // Setup du drag & drop
   const {
     activeId,
     handleDragStart,
     handleDragOver,
     handleDragEnd
   } = useDragAndDrop({
-    items: tasks,
-    onReorder: onTasksReorder,
-    onMove: ({ taskId, destinationContainer }) => {
-      const [newPeriod] = destinationContainer.split('-');
-      onTaskMove(taskId, day, newPeriod);
+    tasks,
+    onTasksReorder,
+    onTaskMove
+  });
+
+  // Setup des zones de drop pour la colonne
+  const { setNodeRef: setMorningRef } = useDroppable({
+    id: `morning-${day}`,
+    data: {
+      type: 'period',
+      period: 'morning',
+      day
+    }
+  });
+
+  const { setNodeRef: setAfternoonRef } = useDroppable({
+    id: `afternoon-${day}`,
+    data: {
+      type: 'period',
+      period: 'afternoon',
+      day
     }
   });
 
@@ -50,27 +69,33 @@ const DayColumn = ({
   return (
     <div className={`h-full flex flex-col border ${
       isToday ? 'border-blue-400' : 'border-gray-200'
-    } bg-white`}>
-      <div className="h-8 flex items-center px-2 border-b">
-        <h2 className="font-medium text-sm text-gray-700">{day}</h2>
+    } bg-white rounded-lg shadow-sm`}>
+      {/* En-tête de la colonne */}
+      <div className="h-8 flex items-center px-3 py-6 border-b">
+        <h2 className={`font-medium ${
+          isToday ? 'text-blue-600' : 'text-gray-700'
+        }`}>
+          {day}
+        </h2>
       </div>
 
-      <DragDropContext
-        items={tasks}
+      {/* Conteneur pour le drag & drop */}
+      <DndContext
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
         <div className="flex-1 grid grid-rows-2 divide-y">
-          <div className="relative h-full">
+          {/* Période du matin */}
+          <div ref={setMorningRef} className="relative h-full">
             <div className="absolute -top-0 left-2 z-10">
               <span className="text-xs font-medium text-gray-500">Matin</span>
             </div>
             <TimeBlock
               period="morning"
+              day={day}
               tasks={morningTasks}
               onAddTask={handleMorningAddTask}
-              containerId={`morning-${day}`}
               onTaskComplete={onTaskComplete}
               onDeleteTask={onDeleteTask}
               onEditTask={onEditTask}
@@ -79,15 +104,16 @@ const DayColumn = ({
             />
           </div>
           
-          <div className="relative h-full">
+          {/* Période de l'après-midi */}
+          <div ref={setAfternoonRef} className="relative h-full">
             <div className="absolute -top-0 left-2 z-10">
               <span className="text-xs font-medium text-gray-500">Après-midi</span>
             </div>
             <TimeBlock
               period="afternoon"
+              day={day}
               tasks={afternoonTasks}
               onAddTask={handleAfternoonAddTask}
-              containerId={`afternoon-${day}`}
               onTaskComplete={onTaskComplete}
               onDeleteTask={onDeleteTask}
               onEditTask={onEditTask}
@@ -96,7 +122,7 @@ const DayColumn = ({
             />
           </div>
         </div>
-      </DragDropContext>
+      </DndContext>
     </div>
   );
 };
