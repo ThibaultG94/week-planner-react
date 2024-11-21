@@ -1,37 +1,97 @@
 import React, { useState } from 'react';
-import { DndContext, closestCenter } from '@dnd-kit/core';
+import { 
+  DndContext, 
+  DragOverlay,
+  closestCenter,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { DAYS_OF_WEEK } from '../utils/constants';
 import { useTaskContext } from '../contexts/TaskContext';
 import DayColumn from './DayColumn';
+import TaskCard from './common/TaskCard';
 
 const WeekView = ({ onAddTask }) => {
+  // États
   const [activeId, setActiveId] = useState(null);
+  const [activeTask, setActiveTask] = useState(null);
   const { tasks, moveTask } = useTaskContext();
 
+  // Configuration des sensors avec des contraintes d'activation
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      // Activation après un mouvement de 5px pour éviter les déclenchements accidentels
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      // Délai de 200ms avec tolérance de mouvement de 5px
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    })
+  );
+
+  // Gestionnaires d'événements
   const handleDragStart = (event) => {
-    setActiveId(event.active.id);
+    const { active } = event;
+    setActiveId(active.id);
+    // Trouver la tâche active pour l'overlay
+    const draggedTask = tasks.find(task => task.id === active.id);
+    setActiveTask(draggedTask);
   };
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
     
-    if (!over) {
+    // Vérification de sécurité : si pas de over ou format invalide, annuler
+    if (!over || !over.id || typeof over.id !== 'string') {
       setActiveId(null);
+      setActiveTask(null);
       return;
     }
 
-    const [targetDay, targetPeriod, targetPosition] = over.id.split('-');
-    
-    moveTask(active.id, targetDay, targetPeriod, parseInt(targetPosition));
-    setActiveId(null);
+    try {
+      // Parse des informations de destination
+      const [targetDay, targetPeriod, targetPosition] = over.id.split('-');
+      
+      // Vérifications supplémentaires
+      if (!targetDay || !targetPeriod || targetPosition === undefined) {
+        console.warn('Invalid drop target format');
+        return;
+      }
+
+      if (!DAYS_OF_WEEK.includes(targetDay) || 
+          !['morning', 'afternoon'].includes(targetPeriod) ||
+          isNaN(parseInt(targetPosition))) {
+        console.warn('Invalid drop target values');
+        return;
+      }
+
+      // Si toutes les vérifications passent, effectuer le déplacement
+      moveTask(active.id, targetDay, targetPeriod, parseInt(targetPosition));
+    } catch (error) {
+      console.error('Error during drag end:', error);
+    } finally {
+      // Toujours nettoyer les états
+      setActiveId(null);
+      setActiveTask(null);
+    }
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)]">
+    <div className="h-[calc(100vh-8rem)] overflow-hidden">
       <DndContext
+        sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         collisionDetection={closestCenter}
+        modifiers={[restrictToWindowEdges]}
       >
         <div className="grid grid-cols-7 gap-2 h-full">
           {DAYS_OF_WEEK.map((day) => (
@@ -44,6 +104,22 @@ const WeekView = ({ onAddTask }) => {
             />
           ))}
         </div>
+
+        {/* Overlay qui suit le curseur pendant le drag */}
+        <DragOverlay>
+          {activeTask ? (
+            <div style={{ 
+              width: '200px',
+              transform: 'rotate(3deg)',
+              cursor: 'grabbing'
+            }}>
+              <TaskCard 
+                task={activeTask}
+                isDragging={true}
+              />
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
     </div>
   );
