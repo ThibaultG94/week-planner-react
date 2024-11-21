@@ -21,7 +21,8 @@ const useDragAndDrop = ({ tasks, onTaskMove, onTasksReorder }) => {
     ({ active, over }) => {
       if (!over || !activeTask) return;
 
-      const [targetPeriod, targetDay, targetPosition] = over.id.split("-");
+      // L'ID suit le format : day-period-position
+      const [targetDay, targetPeriod, targetPosition] = over.id.split("-");
 
       // Ne rien faire si on survole la même position
       if (

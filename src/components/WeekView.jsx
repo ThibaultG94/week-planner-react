@@ -25,14 +25,14 @@ const WeekView = ({
       return;
     }
 
-    // Récupérer les informations du slot cible
-    const [targetPeriod, targetDay, targetPosition] = over.id.split('-');
+    // L'ID est maintenant formaté comme 'day-period-position'
+    const [day, period, position] = over.id.split('-');
     
     // Mettre à jour la tâche avec sa nouvelle position
     onTaskUpdate(active.id, {
-      day: targetDay,
-      period: targetPeriod,
-      position: parseInt(targetPosition)
+      day, // Maintenant dans le bon ordre
+      period, // Maintenant dans le bon ordre
+      position: parseInt(position)
     });
 
     setActiveId(null);
@@ -42,7 +42,7 @@ const WeekView = ({
     onTaskUpdate(taskId, {
       day: targetDay,
       period: targetPeriod,
-      position: position
+      position
     });
   };
 

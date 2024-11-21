@@ -17,6 +17,7 @@ const TimeBlock = ({
   const slots = useMemo(() => {
     const emptySlots = Array(maxTasks).fill(null)
       .map((_, index) => ({
+        // L'ID suit maintenant le format : day-period-position
         id: `${day}-${period}-${index}`,
         position: index,
         task: null
@@ -34,7 +35,7 @@ const TimeBlock = ({
 
   // Setup de la zone de drop pour toute la période
   const { setNodeRef, isOver } = useDroppable({
-    id: `${period}-${day}`,
+    id: `${day}-${period}`, // Identifiant unique pour la période
     data: {
       type: 'period',
       period,
@@ -58,7 +59,7 @@ const TimeBlock = ({
             period={period}
             position={slot.position}
             task={slot.task}
-            onAddTask={() => onAddTask(day, period, slot.position)}
+            onAddTask={() => onAddTask(day, period)}
             onTaskComplete={onTaskComplete}
             onDeleteTask={onDeleteTask}
             onEditTask={onEditTask}

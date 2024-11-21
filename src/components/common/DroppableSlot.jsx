@@ -15,8 +15,11 @@ const DroppableSlot = ({
   onEditTask,
   isActive
 }) => {
+  // Créer l'ID dans le bon ordre : jour-période-position
+  const slotId = `${day}-${period}-${position}`;
+  
   const { setNodeRef, isOver } = useDroppable({
-    id,
+    id: slotId,
     data: {
       type: 'slot',
       day,
