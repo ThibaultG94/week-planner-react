@@ -13,12 +13,13 @@ import { DAYS_OF_WEEK } from "../utils/constants";
 import { useTaskContext } from "../contexts/TaskContext";
 import DayColumn from "./DayColumn";
 import TaskCard from "./common/TaskCard";
+import ParkingZone from "./ParkingZone/ParkingZone";
 
 const WeekView = ({ onAddTask }) => {
   // États
   const [activeId, setActiveId] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
-  const { tasks, moveTask } = useTaskContext();
+  const { tasks, moveTask, parkedTasks } = useTaskContext();
 
   // Configuration des sensors avec des contraintes d'activation
   const sensors = useSensors(
@@ -49,10 +50,17 @@ const WeekView = ({ onAddTask }) => {
   const handleDragOver = (event) => {
     const { active, over } = event;
 
-    // Vérification de sécurité : si pas de over ou format invalide, annuler
-    if (!over || !over.id || typeof over.id !== "string") {
-      setActiveId(null);
-      setActiveTask(null);
+    // Sécurité : si pas de over ou format invalide, annuler
+    if (!over?.id) {
+      return;
+    }
+
+    // Si on déplace vers la zone de parking
+    if (over.id === "parking-zone") {
+      moveTask(active.id, {
+        type: "parking",
+        position: parkedTasks.length, // À la fin de la liste
+      });
       return;
     }
 
@@ -75,8 +83,20 @@ const WeekView = ({ onAddTask }) => {
         return;
       }
 
+      const position = parseInt(targetPosition);
+      // Vérification de position uniquement pour le type 'week'
+      if (position < 0 || position > 3) {
+        console.warn("Invalid position attempted:", position);
+        return;
+      }
+
       // Si toutes les vérifications passent, effectuer le déplacement
-      moveTask(active.id, targetDay, targetPeriod, parseInt(targetPosition));
+      moveTask(active.id, {
+        type: "week",
+        day: targetDay,
+        period: targetPeriod,
+        position: parseInt(targetPosition),
+      });
     } catch (error) {
       console.error("Error during drag end:", error);
     } finally {
@@ -115,32 +135,25 @@ const WeekView = ({ onAddTask }) => {
         collisionDetection={closestCenter}
         modifiers={[customModifier]}
       >
-        <div className="grid grid-cols-7 gap-2 h-full">
+        <div className="grid grid-cols-8 gap-2 h-full">
+          {" "}
+          {/* Modifié de 7 à 8 colonnes */}
+          <ParkingZone />
           {DAYS_OF_WEEK.map((day) => (
             <DayColumn
               key={day}
               day={day}
-              tasks={tasks.filter((task) => task.day === day)}
+              tasks={tasks.filter(
+                (task) =>
+                  task.location.type === "week" && task.location.day === day
+              )}
               onAddTask={onAddTask}
               activeId={activeId}
             />
           ))}
         </div>
 
-        {/* Overlay qui suit le curseur pendant le drag */}
-        <DragOverlay>
-          {activeTask ? (
-            <div
-              style={{
-                width: "200px",
-                transform: "rotate(3deg)",
-                cursor: "grabbing",
-              }}
-            >
-              <TaskCard task={activeTask} isDragging={true} />
-            </div>
-          ) : null}
-        </DragOverlay>
+        <DragOverlay>{/* ... code existant ... */}</DragOverlay>
       </DndContext>
     </div>
   );

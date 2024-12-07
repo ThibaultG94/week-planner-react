@@ -25,8 +25,8 @@ const TimeBlock = React.memo(
 
       // Associer les tâches aux slots correspondants
       tasks.forEach((task) => {
-        if (task.position < maxTasks) {
-          emptySlots[task.position].task = task;
+        if (task.location.position < maxTasks) {
+          emptySlots[task.location.position].task = task;
         }
       });
 

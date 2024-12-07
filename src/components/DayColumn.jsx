@@ -1,38 +1,46 @@
-import { useMemo } from 'react';
-import TimeBlock from './common/TimeBlock';
+import { useMemo } from "react";
+import TimeBlock from "./common/TimeBlock";
 
-const DayColumn = ({ 
-  day, 
-  tasks,
-  onAddTask,
-  activeId
-}) => {
+const DayColumn = ({ day, tasks, onAddTask, activeId }) => {
   // Détecter si c'est aujourd'hui
   const isToday = useMemo(() => {
-    const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long' })
-      .charAt(0).toUpperCase() + 
-      new Date().toLocaleDateString('fr-FR', { weekday: 'long' }).slice(1);
+    const today =
+      new Date()
+        .toLocaleDateString("fr-FR", { weekday: "long" })
+        .charAt(0)
+        .toUpperCase() +
+      new Date().toLocaleDateString("fr-FR", { weekday: "long" }).slice(1);
     return today === day;
   }, [day]);
 
   // Trier les tâches par période
   const { morningTasks, afternoonTasks } = useMemo(() => {
     return {
-      morningTasks: tasks.filter(task => task.period === 'morning')
-        .sort((a, b) => (a.position || 0) - (b.position || 0)),
-      afternoonTasks: tasks.filter(task => task.period === 'afternoon')
-        .sort((a, b) => (a.position || 0) - (b.position || 0))
+      morningTasks: tasks
+        .filter((task) => task.location.period === "morning")
+        .sort(
+          (a, b) => (a.location.position || 0) - (b.location.position || 0)
+        ),
+      afternoonTasks: tasks
+        .filter((task) => task.location.period === "afternoon")
+        .sort(
+          (a, b) => (a.location.position || 0) - (b.location.position || 0)
+        ),
     };
   }, [tasks]);
 
   return (
-    <div className={`h-full flex flex-col border ${
-      isToday ? 'border-blue-400' : 'border-gray-200'
-    } bg-white rounded-lg shadow-sm`}>
+    <div
+      className={`h-full flex flex-col border ${
+        isToday ? "border-blue-400" : "border-gray-200"
+      } bg-white rounded-lg shadow-sm`}
+    >
       <div className="h-8 flex items-center px-3 py-6 border-b">
-        <h2 className={`font-medium ${
-          isToday ? 'text-blue-600' : 'text-gray-700'
-        }`}>
+        <h2
+          className={`font-medium ${
+            isToday ? "text-blue-600" : "text-gray-700"
+          }`}
+        >
           {day}
         </h2>
       </div>
@@ -46,7 +54,7 @@ const DayColumn = ({
           activeId={activeId}
           maxTasks={4}
         />
-        
+
         <TimeBlock
           period="afternoon"
           day={day}

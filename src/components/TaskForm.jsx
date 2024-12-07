@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { DAYS_OF_WEEK } from '../utils/constants';
-import { Plus, X, AlertCircle } from 'lucide-react';
-import { validateTask, hasErrors } from '../utils/validation';
+import React, { useState, useEffect } from "react";
+import { DAYS_OF_WEEK } from "../utils/constants";
+import { Plus, X, AlertCircle } from "lucide-react";
+import { validateTask, hasErrors } from "../utils/validation";
 
-const TaskForm = ({ 
-  onSubmit, 
+const TaskForm = ({
+  onSubmit,
   initialTask = null,
   onCancel,
   preselectedDay,
-  preselectedPeriod
+  preselectedPeriod,
 }) => {
   // Initialiser l'état avec les valeurs préselectionnées si disponibles
   const [task, setTask] = useState({
-    title: '',
+    title: "",
+    locationType: preselectedDay ? "week" : "parking",
     day: preselectedDay || DAYS_OF_WEEK[0],
-    period: preselectedPeriod || 'morning',
-    note: '',
+    period: preselectedPeriod || "morning",
+    note: "",
     completed: false,
-    id: null
+    id: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -28,10 +29,10 @@ const TaskForm = ({
       setTask(initialTask);
     } else if (preselectedDay || preselectedPeriod) {
       // Mettre à jour si on reçoit de nouvelles valeurs préselectionnées
-      setTask(current => ({
+      setTask((current) => ({
         ...current,
         day: preselectedDay || current.day,
-        period: preselectedPeriod || current.period
+        period: preselectedPeriod || current.period,
       }));
     }
   }, [initialTask, preselectedDay, preselectedPeriod]);
@@ -39,7 +40,7 @@ const TaskForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateTask(task);
-    
+
     if (hasErrors(validationErrors)) {
       setErrors(validationErrors);
       return;
@@ -63,7 +64,7 @@ const TaskForm = ({
             onChange={(e) => setTask({ ...task, title: e.target.value })}
             placeholder="Titre de la tâche"
             className={`w-full px-4 py-2 rounded-md border ${
-              errors.title ? 'border-red-400' : 'border-gray-200'
+              errors.title ? "border-red-400" : "border-gray-200"
             }`}
           />
           {errors.title && (
@@ -77,8 +78,10 @@ const TaskForm = ({
             onChange={(e) => setTask({ ...task, day: e.target.value })}
             className="px-4 py-2 rounded-md border border-gray-200"
           >
-            {DAYS_OF_WEEK.map(day => (
-              <option key={day} value={day}>{day}</option>
+            {DAYS_OF_WEEK.map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
             ))}
           </select>
 
@@ -101,6 +104,42 @@ const TaskForm = ({
         />
       </div>
 
+      <div className="space-y-4">
+        <select
+          value={task.locationType}
+          onChange={(e) => setTask({ ...task, locationType: e.target.value })}
+          className="w-full px-4 py-2 rounded-md border border-gray-200"
+        >
+          <option value="parking">Zone de parking</option>
+          <option value="week">Planning hebdomadaire</option>
+        </select>
+
+        {task.locationType === "week" && (
+          <div className="grid grid-cols-2 gap-4">
+            <select
+              value={task.day}
+              onChange={(e) => setTask({ ...task, day: e.target.value })}
+              className="px-4 py-2 rounded-md border border-gray-200"
+            >
+              {DAYS_OF_WEEK.map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={task.period}
+              onChange={(e) => setTask({ ...task, period: e.target.value })}
+              className="px-4 py-2 rounded-md border border-gray-200"
+            >
+              <option value="morning">Matin</option>
+              <option value="afternoon">Après-midi</option>
+            </select>
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-end gap-2">
         {onCancel && (
           <button
@@ -115,11 +154,11 @@ const TaskForm = ({
         <button
           type="submit"
           className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 ${
-            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'En cours...' : 'Ajouter'}
+          {isSubmitting ? "En cours..." : "Ajouter"}
         </button>
       </div>
     </form>
