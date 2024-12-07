@@ -101,42 +101,23 @@ export function TaskProvider({ children }) {
     [setTasks]
   );
 
-  const moveTask = useCallback(
-    (taskId, newLocation) => {
-      console.log("Moving task to:", newLocation);
-      setTasks((currentTasks) => {
-        const taskToMove = currentTasks.find((task) => task.id === taskId);
-        if (!taskToMove) return currentTasks;
+  const moveTask = useCallback((taskId, newLocation) => {
+    setTasks((currentTasks) => {
+      const taskToMove = currentTasks.find((task) => task.id === taskId);
+      if (!taskToMove) return currentTasks;
 
-        // Calculer la nouvelle position en fonction du type de destination
-        let position = 0;
-        if (newLocation.type === "parking") {
-          position = getParkedTasks().length;
-        } else {
-          position = currentTasks.filter(
-            (task) =>
-              task.location.type === "week" &&
-              task.location.day === newLocation.day &&
-              task.location.period === newLocation.period
-          ).length;
+      // Ne pas recalculer la position mais utiliser celle fournie
+      return currentTasks.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            location: newLocation, // Utiliser directement la nouvelle location avec sa position
+          };
         }
-
-        return currentTasks.map((task) => {
-          if (task.id === taskId) {
-            return {
-              ...task,
-              location: {
-                ...newLocation,
-                position,
-              },
-            };
-          }
-          return task;
-        });
+        return task;
       });
-    },
-    [getParkedTasks]
-  );
+    });
+  }, []);
 
   const reorderTasks = useCallback((locationData) => {
     setTasks((currentTasks) => {

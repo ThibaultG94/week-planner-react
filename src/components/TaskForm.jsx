@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { DAYS_OF_WEEK } from "../utils/constants";
-import { Plus, X, AlertCircle } from "lucide-react";
 import { validateTask, hasErrors } from "../utils/validation";
 
 const TaskForm = ({
@@ -13,12 +12,10 @@ const TaskForm = ({
   // Initialiser l'état avec les valeurs préselectionnées si disponibles
   const [task, setTask] = useState({
     title: "",
-    locationType: preselectedDay ? "week" : "parking",
+    locationType: "week", // défaut à 'week'
     day: preselectedDay || DAYS_OF_WEEK[0],
     period: preselectedPeriod || "morning",
     note: "",
-    completed: false,
-    id: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -39,16 +36,21 @@ const TaskForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateTask(task);
 
-    if (hasErrors(validationErrors)) {
-      setErrors(validationErrors);
-      return;
-    }
+    // Créer l'objet final selon le type de localisation
+    const finalTask = {
+      title: task.title,
+      note: task.note,
+      ...(task.locationType === "week"
+        ? {
+            day: task.day,
+            period: task.period,
+          }
+        : {}),
+    };
 
-    setIsSubmitting(true);
     try {
-      await onSubmit(task);
+      await onSubmit(finalTask, task.locationType);
     } finally {
       setIsSubmitting(false);
     }
@@ -72,29 +74,6 @@ const TaskForm = ({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <select
-            value={task.day}
-            onChange={(e) => setTask({ ...task, day: e.target.value })}
-            className="px-4 py-2 rounded-md border border-gray-200"
-          >
-            {DAYS_OF_WEEK.map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={task.period}
-            onChange={(e) => setTask({ ...task, period: e.target.value })}
-            className="px-4 py-2 rounded-md border border-gray-200"
-          >
-            <option value="morning">Matin</option>
-            <option value="afternoon">Après-midi</option>
-          </select>
-        </div>
-
         <textarea
           value={task.note}
           onChange={(e) => setTask({ ...task, note: e.target.value })}
@@ -114,6 +93,7 @@ const TaskForm = ({
           <option value="week">Planning hebdomadaire</option>
         </select>
 
+        {/* N'afficher les sélecteurs que si type='week' */}
         {task.locationType === "week" && (
           <div className="grid grid-cols-2 gap-4">
             <select

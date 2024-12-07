@@ -12,8 +12,8 @@ import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import { DAYS_OF_WEEK } from "../utils/constants";
 import { useTaskContext } from "../contexts/TaskContext";
 import DayColumn from "./DayColumn";
-import TaskCard from "./common/TaskCard";
 import ParkingZone from "./ParkingZone/ParkingZone";
+import TaskCard from "./common/TaskCard";
 
 const WeekView = ({ onAddTask }) => {
   // États
@@ -50,21 +50,25 @@ const WeekView = ({ onAddTask }) => {
   const handleDragOver = (event) => {
     const { active, over } = event;
 
-    // Sécurité : si pas de over ou format invalide, annuler
+    // Si pas de destination valide, remettre à la position initiale
     if (!over?.id) {
-      return;
-    }
-
-    // Si on déplace vers la zone de parking
-    if (over.id === "parking-zone") {
-      moveTask(active.id, {
-        type: "parking",
-        position: parkedTasks.length, // À la fin de la liste
-      });
+      const task = tasks.find((t) => t.id === active.id);
+      if (task) {
+        moveTask(active.id, task.location); // Remettre à la position d'origine
+      }
       return;
     }
 
     try {
+      // Si on déplace vers la zone de parking
+      if (over.id === "parking-zone") {
+        moveTask(active.id, {
+          type: "parking",
+          position: parkedTasks.length,
+        });
+        return;
+      }
+
       // Parse des informations de destination
       const [targetDay, targetPeriod, targetPosition] = over.id.split("-");
 
@@ -99,6 +103,11 @@ const WeekView = ({ onAddTask }) => {
       });
     } catch (error) {
       console.error("Error during drag end:", error);
+      // En cas d'erreur, remettre à la position initiale
+      const task = tasks.find((t) => t.id === active.id);
+      if (task) {
+        moveTask(active.id, task.location);
+      }
     } finally {
       // Toujours nettoyer les états
       setActiveId(null);
@@ -153,7 +162,19 @@ const WeekView = ({ onAddTask }) => {
           ))}
         </div>
 
-        <DragOverlay>{/* ... code existant ... */}</DragOverlay>
+        <DragOverlay>
+          {activeTask ? (
+            <div
+              style={{
+                width: "200px",
+                transform: "rotate(3deg)",
+                cursor: "grabbing",
+              }}
+            >
+              <TaskCard task={activeTask} isDragging={true} />
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
     </div>
   );
