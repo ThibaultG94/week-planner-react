@@ -10,6 +10,7 @@ const TaskForm = ({
   preselectedDay,
   preselectedPeriod
 }) => {
+  // Initialiser l'état avec les valeurs préselectionnées si disponibles
   const [task, setTask] = useState({
     title: '',
     day: preselectedDay || DAYS_OF_WEEK[0],
@@ -25,8 +26,15 @@ const TaskForm = ({
   useEffect(() => {
     if (initialTask) {
       setTask(initialTask);
+    } else if (preselectedDay || preselectedPeriod) {
+      // Mettre à jour si on reçoit de nouvelles valeurs préselectionnées
+      setTask(current => ({
+        ...current,
+        day: preselectedDay || current.day,
+        period: preselectedPeriod || current.period
+      }));
     }
-  }, [initialTask]);
+  }, [initialTask, preselectedDay, preselectedPeriod]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

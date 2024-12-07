@@ -14,6 +14,7 @@ const DroppableSlot = ({
   isOver,
 }) => {
   const slotId = `${day}-${period}-${position}`;
+  // Utiliser directement openTaskForm du contexte
   const { openTaskForm } = useTaskContext();
   
   const { setNodeRef } = useDroppable({
@@ -69,6 +70,11 @@ const DroppableSlot = ({
     }
   };
 
+  // Gestionnaire de clic pour l'ajout de tâche
+  const handleAddTaskClick = () => {
+    openTaskForm(day, period); // Passer directement le jour et la période
+  };
+
   return (
     <motion.div 
       ref={setNodeRef}
@@ -102,18 +108,18 @@ const DroppableSlot = ({
         </motion.div>
       )}
 
-      {/* Bouton d'ajout de tâche */}
+      {/* Bouton d'ajout de tâche avec espacement ajusté */}
       {!task && !isOver && (
         <motion.button
-          onClick={() => openTaskForm(day, period)}
+          onClick={handleAddTaskClick}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="absolute inset-0 flex items-center justify-center opacity-0 
             hover:opacity-100 text-gray-400 hover:text-blue-500 
             hover:bg-gray-50/80 rounded-lg transition-all duration-200 z-20"
         >
-          <Plus className="w-4 h-4 mr-1" />
-          <span className="text-xs font-medium">Ajouter une tâche</span>
+          <Plus className="w-4 h-4" />
+          <span className="text-xs font-medium -ml-0.5">Ajouter une tâche</span>
         </motion.button>
       )}
     </motion.div>
