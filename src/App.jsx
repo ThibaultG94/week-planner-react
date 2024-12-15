@@ -5,6 +5,8 @@ import { TaskProvider } from "./contexts/TaskContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import SignUpForm from "./components/auth/SignUpForm";
 import SignInForm from "./components/auth/SingInForm";
+import { supabase } from "./lib/supabase";
+import { migrateTasksToSupabase } from "./lib/taskMigration";
 
 function App() {
   const { user } = useAuth();
@@ -16,11 +18,50 @@ function App() {
     day: null,
     period: null,
   });
+  const [isMigrating, setIsMigrating] = useState(false);
 
   const handleOpenTaskForm = (day, period) => {
     setSelectedPeriod({ day, period });
     setIsTaskFormOpen(true);
   };
+
+  // Dans la fonction App
+  async function migrateLocalTasks() {
+    // On vérifie qu'on a bien un utilisateur connecté
+    if (!user) {
+      console.error("Pas d'utilisateur connecté");
+      return;
+    }
+
+    // On active l'indicateur de chargement
+    setIsMigrating(true);
+
+    try {
+      // On appelle notre fonction de migration
+      const result = await migrateTasksToSupabase(user, supabase);
+
+      if (result.success) {
+        // Fermer le dialogue de migration
+        setShowMigrationDialog(false);
+
+        // Rafraîchir l'état des tâches
+        // Note: il faudra adapter ça selon comment tu gères le chargement des tâches
+        // dans ton TaskContext
+
+        // Afficher un message de succès
+        alert("Migration réussie !");
+      } else {
+        // En cas d'erreur, afficher un message
+        alert("La migration a échoué : " + result.error);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la migration:", error);
+      alert("Une erreur est survenue pendant la migration");
+    } finally {
+      // Dans tous les cas, on désactive l'indicateur de chargement
+      setIsMigrating(false);
+    }
+  }
 
   return (
     <AuthProvider>
@@ -85,9 +126,12 @@ function App() {
                 <div className="flex gap-2 justify-end">
                   <button
                     onClick={migrateLocalTasks}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                    disabled={isMigrating}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50"
                   >
-                    Transférer vers mon compte
+                    {isMigrating
+                      ? "Migration en cours..."
+                      : "Transférer vers mon compte"}
                   </button>
                   <button
                     onClick={clearLocalTasks}
