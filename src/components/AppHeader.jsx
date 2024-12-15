@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import TaskForm from "./TaskForm";
 import { useTaskContext } from "../contexts/TaskContext";
 
-const AppHeader = () => {
+const AppHeader = ({ setAuthModalOpen }) => {
   // Récupérer l'état d'authentification et les méthodes
   const { user, signOut } = useAuth();
 
@@ -39,17 +39,13 @@ const AppHeader = () => {
               ) : (
                 <>
                   <button
-                    onClick={() => {
-                      /* TODO: ouvrir modal connexion */
-                    }}
+                    onClick={() => setAuthModalOpen("signin")}
                     className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     Se connecter
                   </button>
                   <button
-                    onClick={() => {
-                      /* TODO: ouvrir modal inscription */
-                    }}
+                    onClick={() => setAuthModalOpen("signup")}
                     className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     S'inscrire

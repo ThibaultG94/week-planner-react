@@ -2,36 +2,24 @@ import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { AlertTriangle, X } from "lucide-react";
 
-const SignUpForm = ({ onClose }) => {
+const SignInForm = ({ onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signUp } = useAuth();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Validations
-    if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
     try {
       setLoading(true);
-      await signUp(email, password);
+      await signIn(email, password);
       onClose?.();
     } catch (err) {
-      setError(err.message);
+      setError("Email ou mot de passe incorrect");
     } finally {
       setLoading(false);
     }
@@ -40,7 +28,7 @@ const SignUpForm = ({ onClose }) => {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-semibold">Créer un compte</h2>
+        <h2 className="text-xl font-semibold">Se connecter</h2>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
           <X size={20} />
         </button>
@@ -72,15 +60,6 @@ const SignUpForm = ({ onClose }) => {
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirmer le mot de passe"
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
         </div>
 
         <button
@@ -88,11 +67,11 @@ const SignUpForm = ({ onClose }) => {
           disabled={loading}
           className="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "Création du compte..." : "S'inscrire"}
+          {loading ? "Connexion..." : "Se connecter"}
         </button>
       </form>
     </div>
   );
 };
 
-export default SignUpForm;
+export default SignInForm;

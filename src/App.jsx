@@ -3,10 +3,12 @@ import AppHeader from "./components/AppHeader";
 import WeekView from "./components/WeekView";
 import { TaskProvider } from "./contexts/TaskContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import SignUpForm from "./components/auth/SignUpForm";
+import SignInForm from "./components/auth/SingInForm";
 
 function App() {
   const { user } = useAuth();
-  const [authModalOpen, setAuthModalOpen] = useState(null); // 'signin' ou 'signup' ou null
+  const [authModalOpen, setAuthModalOpen] = useState(null); // 'signin' ou 'signup'
   const [showMigrationDialog, setShowMigrationDialog] = useState(false);
   const [localStorageTasks, setLocalStorageTasks] = useState([]);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -34,9 +36,20 @@ function App() {
               setIsTaskFormOpen(false);
             }}
             selectedPeriod={selectedPeriod}
-            className="flex-shrink-0" // Empêche l'header de rétrécir
+            setAuthModalOpen={setAuthModalOpen} // Ajout de cette prop
+            className="flex-shrink-0"
           />
-
+          {authModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+                {authModalOpen === "signup" ? (
+                  <SignUpForm onClose={() => setAuthModalOpen(null)} />
+                ) : (
+                  <SignInForm onClose={() => setAuthModalOpen(null)} />
+                )}
+              </div>
+            </div>
+          )}
           {/* Bannière d'avertissement si non connecté */}
           {!user && (
             <div className="bg-yellow-50 p-4 border-b border-yellow-100">
