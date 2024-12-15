@@ -2,20 +2,20 @@
 
 ## 1. État Actuel du Projet (15/12/2024)
 
-### 1.1 Frontend (Complété)
+### 1.1 Frontend (En cours)
 
-- Application React fonctionnelle
-- Interface drag & drop avec dnd-kit
-- Gestion locale des tâches
-- Corrections des bugs majeurs:
-  - ✓ Problème de disparition pendant le drag & drop
-  - ✓ Problème d'édition dans le TaskForm
-  - ✓ Collision de position des tâches
+- Application React fonctionnelle avec drag & drop
+- Interface d'authentification implémentée :
+  - ✓ AuthContext avec Supabase
+  - ✓ Formulaires de connexion/inscription
+  - ✓ Bannière d'avertissement pour utilisateurs non connectés
+- En attente :
+  - Migration des données localStorage vers Supabase
+  - Adaptation du TaskContext pour Supabase
 
-### 1.2 Backend (En cours)
+### 1.2 Backend (Complété)
 
-- Supabase configuré comme solution backend
-- Base de données créée avec :
+- Supabase configuré :
 
   ```sql
   Table users (
@@ -39,112 +39,59 @@
   )
   ```
 
-- RLS (Row Level Security) configuré :
-  - Policy "Users can access their own tasks" créée
-  - Sécurité basée sur user_id
+- RLS configuré
 
-## 2. Prochaines Étapes Immédiates
+## 2. Prochaine Étape : Migration vers Supabase
 
-### 2.1 Intégration Supabase (Priorité Haute)
+### 2.1 TaskContext
 
-1. Installation du client Supabase :
+1. Modifier TaskContext pour utiliser l'API Supabase :
 
-```bash
-npm install @supabase/supabase-js
-```
+   - Adapter addTask, updateTask, deleteTask
+   - Gérer la synchronisation des données
+   - Implémenter la gestion des erreurs
 
-2. Configuration du client React :
+2. Migration des données :
+   - Implémenter migrateLocalTasks
+   - Gérer la transition localStorage -> Supabase
+   - Validation des données migrées
 
-- Créer fichiers d'environnement (.env)
-- Setup du client Supabase
-- Création d'un AuthContext
+### 2.2 Optimisations
 
-3. Adaptation des composants :
+- Cache local des données Supabase
+- Gestion optimiste des mises à jour
+- Gestion hors-ligne
 
-- Migration du TaskContext vers Supabase
-- Gestion des states de chargement
-- Gestion des erreurs
-
-4. Migration des données :
-
-- Création d'une stratégie de migration localStorage -> Supabase
-- Tests de la migration
-
-### 2.2 Authentification (Priorité Moyenne)
-
-- Configuration de l'auth Supabase
-- Création des écrans de login/register
-- Sécurisation des routes
-- Configuration RLS pour la table tasks
-
-## 3. Améliorations UX/UI Prévues
+## 3. Roadmap
 
 ### 3.1 Court Terme
 
-1. Feedback visuel
-
-- Animations de transition
-- Indicateurs de chargement
-- Messages d'erreur
-
-2. Optimisations drag & drop
-
-- Utilisation optimisée de useTaskPositioning
-- Swap de positions
-- Animations fluides
+1. Finaliser intégration Supabase
+2. Tests et débogage
+3. Optimisations de performance
 
 ### 3.2 Moyen Terme
 
-- Mode sombre
-- Filtres et recherche
-- Vue mobile optimisée
+- Système de partage d'agendas
+- Statistiques d'utilisation
+- Mode hors-ligne complet
 
-## 4. Infrastructure
+## 4. Standards Techniques
 
-### 4.1 Déploiement
+### 4.1 État des données
 
-- Configuration CapRover pour Supabase
-- Migration vers serveur de production
-- Configuration des sauvegardes
+- Supabase comme source principale
+- Cache local pour performance
+- État React pour UI
 
-### 4.2 Monitoring
+### 4.2 Authentification
 
-- Logs d'erreur
-- Métriques de performance
-- Surveillance des ressources
+- Gestion via Supabase Auth
+- Sessions persistantes
+- Sécurité RLS
 
-## 5. Dette Technique
+### 4.3 Gestion des erreurs
 
-### 5.1 Priorités
-
-1. Tests
-
-- Tests unitaires pour les hooks
-- Tests d'intégration Supabase
-- Tests E2E des fonctionnalités critiques
-
-2. Documentation
-
-- API documentation
-- Guide de déploiement
-- Documentation utilisateur
-
-### 5.2 Optimisations
-
-- Lazy loading
-- Memoization des composants
-- Gestion du cache
-
-## 6. Métriques de Succès
-
-### 6.1 Performance
-
-- Temps de chargement < 2s
-- FPS > 30 pendant le drag & drop
-- Latence API < 300ms
-
-### 6.2 Engagement
-
-- Mesures d'utilisation
-- Feedback utilisateur
-- Taux d'erreur
+- Retours utilisateur clairs
+- Logging des erreurs
+- Fallbacks appropriés
