@@ -78,6 +78,21 @@ const WeekView = ({ onAddTask }) => {
         return;
       }
 
+      // Vérifier si la position est déjà occupée
+      const isPositionTaken = tasks.some(
+        (task) =>
+          task.id !== active.id && // Ignorer la tâche en cours de déplacement
+          task.location.type === "week" &&
+          task.location.day === targetDay &&
+          task.location.period === targetPeriod &&
+          task.location.position === parseInt(targetPosition)
+      );
+
+      if (isPositionTaken) {
+        console.warn("Position already taken");
+        return; // Ne pas permettre le drop
+      }
+
       if (
         !DAYS_OF_WEEK.includes(targetDay) ||
         !["morning", "afternoon"].includes(targetPeriod) ||
