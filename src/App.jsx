@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppHeader from "./components/AppHeader";
 import WeekView from "./components/WeekView";
 import { TaskProvider } from "./contexts/TaskContext";
@@ -62,6 +62,25 @@ function App() {
       setIsMigrating(false);
     }
   }
+
+  function clearLocalTasks() {
+    localStorage.removeItem("weekplanner-tasks");
+    setLocalStorageTasks([]);
+    setShowMigrationDialog(false);
+  }
+
+  useEffect(() => {
+    // Vérifier s'il y a des tâches dans le localStorage quand un utilisateur se connecte
+    if (user) {
+      const tasks = JSON.parse(
+        localStorage.getItem("weekplanner-tasks") || "[]"
+      );
+      if (tasks.length > 0) {
+        setLocalStorageTasks(tasks);
+        setShowMigrationDialog(true);
+      }
+    }
+  }, [user]); // Se déclenche quand l'utilisateur change
 
   return (
     <AuthProvider>
