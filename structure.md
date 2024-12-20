@@ -26,6 +26,10 @@ week-planner-react/
 │   │   ├── useLocalStorage.js        # Persistence locale
 │   │   ├── useTaskPositioning.js     # Positionnement des tâches
 │   │   └── useViewMode.js            # Mode d'affichage
+│   ├── lib/
+│   │   ├── supabase.js
+│   │   ├── taskMigration.js
+│   │   └── TaskStorageService.js
 │   ├── utils/           # Utilitaires
 │   │   ├── animations.js       # Animations
 │   │   ├── constants.js        # Constantes

@@ -1,156 +1,174 @@
-import { createContext, useContext, useCallback, useState } from "react";
-import useLocalStorage from "../hooks/useLocalStorage";
-import { STORAGE_KEY } from "../utils/constants";
+import {
+  createContext,
+  useContext,
+  useCallback,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
+import { useAuth } from "./AuthContext";
+import TaskStorageService from "../lib/TaskStorageService";
 
 const TaskContext = createContext(null);
 
 export function TaskProvider({ children }) {
-  const [tasks, setTasks] = useLocalStorage(STORAGE_KEY, []);
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const getParkedTasks = useCallback(() => {
-    return tasks.filter((task) => task.location.type === "parking");
-  }, [tasks]);
+  // Création du service avec mémoïsation
+  const storageService = useMemo(() => new TaskStorageService(user), [user]);
 
-  const getWeekTasks = useCallback(() => {
-    return tasks.filter((task) => task.location.type === "week");
-  }, [tasks]);
+  // Chargement initial des tâches
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        setLoading(true);
+        const loadedTasks = await storageService.getTasks();
+        setTasks(loadedTasks);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTasks();
+  }, [storageService]);
 
   const addTask = useCallback(
-    (newTask, locationType = "week") => {
-      const completeTask = {
-        ...newTask,
-        id: Date.now(),
-        completed: false,
-        location:
-          locationType === "week"
-            ? {
-                type: "week",
-                day: newTask.day,
-                period: newTask.period,
-                position: tasks.filter(
-                  (t) =>
-                    t.location.type === "week" &&
-                    t.location.day === newTask.day &&
-                    t.location.period === newTask.period
-                ).length,
-              }
-            : {
-                type: "parking",
-                position: getParkedTasks().length,
-              },
-      };
-      setTasks((currentTasks) => [...currentTasks, completeTask]);
+    async (newTask, locationType = "week") => {
+      try {
+        const addedTask = await storageService.addTask({
+          ...newTask,
+          completed: false,
+          location:
+            locationType === "week"
+              ? {
+                  type: "week",
+                  day: newTask.day,
+                  period: newTask.period,
+                  position: tasks.filter(
+                    (t) =>
+                      t.location.type === "week" &&
+                      t.location.day === newTask.day &&
+                      t.location.period === newTask.period
+                  ).length,
+                }
+              : {
+                  type: "parking",
+                  position: tasks.filter((t) => t.location.type === "parking")
+                    .length,
+                },
+        });
+
+        setTasks((currentTasks) => [...currentTasks, addedTask]);
+      } catch (err) {
+        setError(err);
+      }
     },
-    [tasks, getParkedTasks]
+    [tasks, storageService]
   );
 
   const editTask = useCallback((task) => {
-    console.log("Editing task:", task);
     setEditingTask(task);
     setIsFormOpen(true);
   }, []);
 
   const updateTask = useCallback(
-    (taskId, updates) => {
-      console.log("Updating task:", taskId, updates);
-      setTasks((currentTasks) =>
-        currentTasks.map((task) =>
-          task.id === taskId ? { ...task, ...updates } : task
-        )
-      );
-      setIsFormOpen(false);
-      setEditingTask(null);
+    async (taskId, updates) => {
+      try {
+        // Mise à jour optimiste
+        setTasks((currentTasks) =>
+          currentTasks.map((task) =>
+            task.id === taskId ? { ...task, ...updates } : task
+          )
+        );
+
+        // Appel API
+        await storageService.updateTask(taskId, updates);
+        setIsFormOpen(false);
+        setEditingTask(null);
+      } catch (err) {
+        setError(err);
+        // Annuler la mise à jour optimiste en rechargeant les tâches
+        const freshTasks = await storageService.getTasks();
+        setTasks(freshTasks);
+      }
     },
-    [setTasks]
+    [storageService]
   );
 
   const deleteTask = useCallback(
-    (taskId) => {
-      setTasks((currentTasks) => {
-        const updatedTasks = currentTasks.filter((task) => task.id !== taskId);
-        // Réorganiser les positions des tâches restantes
-        const taskToDelete = currentTasks.find((t) => t.id === taskId);
-        if (taskToDelete) {
-          const samePeriodTasks = updatedTasks
-            .filter(
-              (t) =>
-                t.day === taskToDelete.day && t.period === taskToDelete.period
-            )
-            .sort((a, b) => a.position - b.position);
+    async (taskId) => {
+      try {
+        // Mise à jour optimiste
+        const previousTasks = [...tasks];
+        setTasks((currentTasks) =>
+          currentTasks.filter((task) => task.id !== taskId)
+        );
 
-          samePeriodTasks.forEach((task, index) => {
-            task.position = index;
-          });
-        }
-        return updatedTasks;
-      });
+        // Appel API
+        await storageService.deleteTask(taskId);
+      } catch (err) {
+        setError(err);
+        // Restaurer l'état précédent en cas d'erreur
+        setTasks(previousTasks);
+      }
     },
-    [setTasks]
+    [tasks, storageService]
   );
 
   const toggleTaskComplete = useCallback(
-    (taskId) => {
-      setTasks((currentTasks) =>
-        currentTasks.map((task) =>
-          task.id === taskId ? { ...task, completed: !task.completed } : task
-        )
-      );
+    async (taskId) => {
+      try {
+        const task = tasks.find((t) => t.id === taskId);
+        if (!task) return;
+
+        // Mise à jour optimiste
+        setTasks((currentTasks) =>
+          currentTasks.map((t) =>
+            t.id === taskId ? { ...t, completed: !t.completed } : t
+          )
+        );
+
+        // Appel API
+        await storageService.updateTask(taskId, { completed: !task.completed });
+      } catch (err) {
+        setError(err);
+        // Restaurer l'état précédent en rechargeant les tâches
+        const freshTasks = await storageService.getTasks();
+        setTasks(freshTasks);
+      }
     },
-    [setTasks]
+    [tasks, storageService]
   );
 
-  const moveTask = useCallback((taskId, newLocation) => {
-    setTasks((currentTasks) => {
-      const taskToMove = currentTasks.find((task) => task.id === taskId);
-      if (!taskToMove) return currentTasks;
-
-      // Ne pas recalculer la position mais utiliser celle fournie
-      return currentTasks.map((task) => {
-        if (task.id === taskId) {
-          return {
-            ...task,
-            location: newLocation, // Utiliser directement la nouvelle location avec sa position
-          };
-        }
-        return task;
-      });
-    });
-  }, []);
-
-  const reorderTasks = useCallback((locationData) => {
-    setTasks((currentTasks) => {
-      const tasksInLocation = currentTasks.filter((task) => {
-        if (locationData.type === "parking") {
-          return task.location.type === "parking";
-        }
-        return (
-          task.location.type === "week" &&
-          task.location.day === locationData.day &&
-          task.location.period === locationData.period
+  const moveTask = useCallback(
+    async (taskId, newLocation) => {
+      try {
+        // Mise à jour optimiste
+        setTasks((currentTasks) =>
+          currentTasks.map((task) =>
+            task.id === taskId ? { ...task, location: newLocation } : task
+          )
         );
-      });
 
-      // Réorganiser les positions
-      tasksInLocation.sort((a, b) => a.location.position - b.location.position);
-      const updatedTasks = tasksInLocation.map((task, index) => ({
-        ...task,
-        location: {
-          ...task.location,
-          position: index,
-        },
-      }));
+        // Appel API
+        await storageService.updateTask(taskId, { location: newLocation });
+      } catch (err) {
+        setError(err);
+        // Restaurer l'état précédent en rechargeant les tâches
+        const freshTasks = await storageService.getTasks();
+        setTasks(freshTasks);
+      }
+    },
+    [storageService]
+  );
 
-      // Mettre à jour uniquement les tâches concernées
-      return currentTasks.map((task) => {
-        const updatedTask = updatedTasks.find((t) => t.id === task.id);
-        return updatedTask || task;
-      });
-    });
-  }, []);
-
-  // Gestion du formulaire
   const openTaskForm = useCallback(() => {
     setEditingTask(null);
     setIsFormOpen(true);
@@ -166,9 +184,12 @@ export function TaskProvider({ children }) {
     tasks,
     isFormOpen,
     editingTask,
+    loading,
+    error,
 
-    parkedTasks: getParkedTasks(),
-    weekTasks: getWeekTasks(),
+    // Filtres
+    parkedTasks: tasks.filter((task) => task.location.type === "parking"),
+    weekTasks: tasks.filter((task) => task.location.type === "week"),
 
     // Actions tâches
     addTask,
@@ -193,3 +214,5 @@ export function useTaskContext() {
   }
   return context;
 }
+
+export default TaskContext;
