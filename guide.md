@@ -32,6 +32,17 @@ WeekPlanner est une application de planification hebdomadaire basée sur React, 
 
 week-planner-react/
 ├── src/
+│ ├── **tests**/ # Dossier principal des tests
+│ │ ├── flows/ # Tests de flux utilisateur
+│ │ │ ├── authentication.test.js
+│ │ │ ├── dataMigration.test.js
+│ │ │ └── errorHandling.test.js
+│ │ ├── unit/ # Tests unitaires
+│ │ │ └── services/
+│ │ │ └── TaskStorageService.test.js
+│ │ └── utils/ # Utilitaires de test
+│ │ ├── setup.js
+│ │ └── mocks.js
 │ ├── components/ # Composants React
 │ │ ├── common/ # Composants réutilisables
 │ │ │ ├── AnimatedTransition.jsx
