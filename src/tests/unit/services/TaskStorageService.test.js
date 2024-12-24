@@ -40,5 +40,28 @@ describe("TaskStorageService", () => {
         id: expect.any(Number),
       });
     });
+
+    it("should add task to Supabase when user is logged in", async () => {
+      // Arrange
+      service = new TaskStorageService(mockUser);
+      const mockSupabaseResponse = {
+        data: { ...mockTask, id: 1, user_id: mockUser.id },
+      };
+      const supabaseMock = vi
+        .spyOn(service.supabase.from("tasks"), "insert")
+        .mockResolvedValue(mockSupabaseResponse);
+
+      // Act
+      const result = await service.addTask(mockTask);
+
+      // Assert
+      expect(supabaseMock).toHaveBeenCalledWith([
+        expect.objectContaining({
+          ...mockTask,
+          user_id: mockUser.id,
+        }),
+      ]);
+      expect(result).toEqual(mockSupabaseResponse.data);
+    });
   });
 });
