@@ -2,6 +2,15 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import TaskStorageService from "../../../lib/TaskStorageService";
 import { STORAGE_KEY } from "../../../utils/constants";
 
+const mockSupabaseClient = {
+  from: vi.fn().mockReturnValue({
+    insert: vi.fn(),
+    select: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  }),
+};
+
 describe("TaskStorageService", () => {
   let service;
   const mockUser = { id: "user123" };
@@ -16,10 +25,9 @@ describe("TaskStorageService", () => {
   };
 
   beforeEach(() => {
-    vi.restoreAllMocks();
-    vi.spyOn(localStorage, "getItem");
-    vi.spyOn(localStorage, "setItem");
-    vi.spyOn(localStorage, "removeItem");
+    vi.clearAllMocks();
+    service = new TaskStorageService(mockUser);
+    service.supabase = mockSupabaseClient; // Injecter le mock
   });
 
   describe("addTask", () => {
