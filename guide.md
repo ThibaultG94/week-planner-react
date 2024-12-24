@@ -78,6 +78,7 @@ week-planner-react/
 ├── index.html
 ├── postcss.config.js
 ├── tailwind.config.js
+├── vitest.config.js
 └── vite.config.js
 
 ### 2.3 Patterns Identifiés

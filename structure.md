@@ -7,6 +7,17 @@ week-planner-react/
 │   ├── react.svg         # Logo React
 │   └── vite.svg          # Logo Vite
 ├── src/                  # Code source
+│   ├── **tests**/ # Dossier principal des tests
+│   │ ├── flows/ # Tests de flux utilisateur
+│   │ │ ├── authentication.test.js
+│   │ │ ├── dataMigration.test.js
+│   │ │ └── errorHandling.test.js
+│   │ ├── unit/ # Tests unitaires
+│   │ │ └── services/
+│   │ │ └── TaskStorageService.test.js
+│   │ └── utils/ # Utilitaires de test
+│   │ ├── setup.js
+│   │ └── mocks.js
 │   ├── components/       # Composants React
 │   │   ├── common/       # Composants réutilisables
 │   │   │   ├── AnimatedTransition.jsx   # Animation des transitions
@@ -47,6 +58,7 @@ week-planner-react/
 ├── postcss.config.js   # Configuration PostCSS
 ├── README.md           # Documentation
 ├── tailwind.config.js  # Configuration Tailwind
+├── vitest.config.js      # Configuration Vitest
 └── vite.config.js      # Configuration Vite
 ```
 
