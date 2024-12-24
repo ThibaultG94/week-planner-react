@@ -38,8 +38,8 @@ week-planner-react/
 │ │ │ ├── dataMigration.test.js
 │ │ │ └── errorHandling.test.js
 │ │ ├── unit/ # Tests unitaires
-│ │ │ └── services/
-│ │ │ └── TaskStorageService.test.js
+│ │ │ ├── services/
+│ │ │ │ └── TaskStorageService.test.js
 │ │ └── utils/ # Utilitaires de test
 │ │ ├── setup.js
 │ │ └── mocks.js
