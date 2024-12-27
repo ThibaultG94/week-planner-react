@@ -23,6 +23,8 @@ describe("TaskStorageService", () => {
       position: 0,
     },
   };
+  service = new TaskStorageService(mockUser);
+  service.supabase = mockSupabase;
 
   beforeEach(() => {
     vi.clearAllMocks();
