@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { migrateTasksToSupabase } from "../../lib/taskMigration";
+import { migrateTasksToSupabase } from "../../../lib/taskMigration";
 import { STORAGE_KEY } from "../../utils/constants";
 
 describe("taskMigration", () => {

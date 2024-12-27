@@ -10,26 +10,22 @@ const localStorageMock = {
 };
 global.localStorage = localStorageMock;
 
-// Mock de Supabase
-vi.mock("@supabase/supabase-js", () => ({
-  createClient: () => ({
-    auth: {
-      getUser: vi.fn(),
-      getSession: vi.fn(),
-      signInWithPassword: vi.fn(),
-      signUp: vi.fn(),
-      signOut: vi.fn(),
-      onAuthStateChange: vi.fn().mockReturnValue({
-        data: { subscription: { unsubscribe: vi.fn() } },
-      }),
-    },
-    from: vi.fn(() => ({
-      select: vi.fn(),
-      insert: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      eq: vi.fn(),
-      single: vi.fn(),
-    })),
-  }),
-}));
+// Mock de Supabase plus détaillé
+const mockSupabase = {
+  auth: {
+    getUser: vi.fn(),
+    getSession: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signUp: vi.fn(),
+    signOut: vi.fn(),
+  },
+  from: vi.fn(() => ({
+    select: vi.fn(),
+    insert: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  })),
+};
+
+// Export pour utilisation dans les tests
+global.mockSupabase = mockSupabase;
