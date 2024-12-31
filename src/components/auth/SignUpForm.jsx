@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, CheckCircle, X } from "lucide-react";
 
 const SignUpForm = ({ onClose }) => {
   const [email, setEmail] = useState("");
@@ -8,6 +8,7 @@ const SignUpForm = ({ onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const { signUp } = useAuth();
 
@@ -29,13 +30,56 @@ const SignUpForm = ({ onClose }) => {
     try {
       setLoading(true);
       await signUp(email, password);
-      onClose?.();
+      setSuccess(true);
+      // onClose?.();
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="w-full">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-semibold">Inscription réussie</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4 text-green-600">
+            <CheckCircle size={24} />
+            <h3 className="text-lg font-medium">Compte créé avec succès !</h3>
+          </div>
+
+          <p className="text-gray-600 mb-4">
+            Un email de confirmation a été envoyé à <span>{email}</span>.<br />
+            Veuillez cliquer sur le lien dans l'email pour activer votre compte.
+          </p>
+
+          <p className="text-sm text-gray-500 mb-6">
+            Si vous ne recevez pas l'email dans les prochaines minutes, vérifiez
+            votre dossier spam.
+          </p>
+
+          <button
+            onClick={onClose}
+            type="button"
+            className="w-full py-2 px-4 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
