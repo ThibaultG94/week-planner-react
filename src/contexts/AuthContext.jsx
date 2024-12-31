@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Vérifier la session active
+    // Check active session
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -23,12 +23,23 @@ export function AuthProvider({ children }) {
   const signUp = async (email, password) => {
     try {
       setError(null);
+      // 1. Create user wuth Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) throw error;
+
+      // 2. Create the corresponding entry in the users table
+      if (data?.user) {
+        const { error: userError } = await supabase.from("users").insert({
+          id: data.user.id,
+          email: data.user.email,
+        });
+
+        if (userError) throw userError;
+      }
 
       return data;
     } catch (err) {
