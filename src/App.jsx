@@ -10,7 +10,7 @@ import { migrateTasksToSupabase } from "./lib/taskMigration";
 
 function App() {
   const { user } = useAuth();
-  const [authModalOpen, setAuthModalOpen] = useState(null); // 'signin' ou 'signup'
+  const [authModalOpen, setAuthModalOpen] = useState(null); // 'signin' or 'signup'
   const [showMigrationDialog, setShowMigrationDialog] = useState(false);
   const [localStorageTasks, setLocalStorageTasks] = useState([]);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -25,40 +25,36 @@ function App() {
     setIsTaskFormOpen(true);
   };
 
-  // Dans la fonction App
   async function migrateLocalTasks() {
-    // On vérifie qu'on a bien un utilisateur connecté
+    // Check that you have a logged-in user
     if (!user) {
       console.error("Pas d'utilisateur connecté");
       return;
     }
 
-    // On active l'indicateur de chargement
+    // Activate loading indicator
     setIsMigrating(true);
 
     try {
-      // On appelle notre fonction de migration
+      // We call our migration function
       const result = await migrateTasksToSupabase(user, supabase);
 
       if (result.success) {
-        // Fermer le dialogue de migration
         setShowMigrationDialog(false);
 
-        // Rafraîchir l'état des tâches
-        // Note: il faudra adapter ça selon comment tu gères le chargement des tâches
-        // dans ton TaskContext
+        // Refresh task status
+        // Note: il faudra adapter ça selon comment on gère le chargement des tâches
+        // dans TaskContext
 
-        // Afficher un message de succès
         alert("Migration réussie !");
       } else {
-        // En cas d'erreur, afficher un message
         alert("La migration a échoué : " + result.error);
       }
     } catch (error) {
       console.error("Erreur lors de la migration:", error);
       alert("Une erreur est survenue pendant la migration");
     } finally {
-      // Dans tous les cas, on désactive l'indicateur de chargement
+      // In all cases, the loading indicator is disabled.
       setIsMigrating(false);
     }
   }
@@ -70,7 +66,7 @@ function App() {
   }
 
   useEffect(() => {
-    // Vérifier s'il y a des tâches dans le localStorage quand un utilisateur se connecte
+    // Check if there are tasks in the localStorage when a user logs in
     if (user) {
       const tasks = JSON.parse(
         localStorage.getItem("weekplanner-tasks") || "[]"
@@ -80,7 +76,7 @@ function App() {
         setShowMigrationDialog(true);
       }
     }
-  }, [user]); // Se déclenche quand l'utilisateur change
+  }, [user]); // Triggered when user changes
 
   return (
     <AuthProvider>
@@ -110,7 +106,7 @@ function App() {
               </div>
             </div>
           )}
-          {/* Bannière d'avertissement si non connecté */}
+          {/* Warning banner if not connected */}
           {!user && (
             <div className="bg-yellow-50 p-4 border-b border-yellow-100">
               <div className="flex justify-between items-center max-w-7xl mx-auto">
@@ -131,7 +127,7 @@ function App() {
             </div>
           )}
 
-          {/* Dialog de migration si nécessaire */}
+          {/* Migration dialog if required */}
           {showMigrationDialog && localStorageTasks.length > 0 && (
             <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
