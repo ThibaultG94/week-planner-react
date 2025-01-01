@@ -19,10 +19,10 @@ export function TaskProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Création du service avec mémoïsation
+  // Service creation with memoization
   const storageService = useMemo(() => new TaskStorageService(user), [user]);
 
-  // Chargement initial des tâches
+  // Initial task loading
   useEffect(() => {
     const loadTasks = async () => {
       try {
@@ -81,20 +81,20 @@ export function TaskProvider({ children }) {
   const updateTask = useCallback(
     async (taskId, updates) => {
       try {
-        // Mise à jour optimiste
+        // Update
         setTasks((currentTasks) =>
           currentTasks.map((task) =>
             task.id === taskId ? { ...task, ...updates } : task
           )
         );
 
-        // Appel API
+        // API call
         await storageService.updateTask(taskId, updates);
         setIsFormOpen(false);
         setEditingTask(null);
       } catch (err) {
         setError(err);
-        // Annuler la mise à jour optimiste en rechargeant les tâches
+        // Cancel update by reloading tasks
         const freshTasks = await storageService.getTasks();
         setTasks(freshTasks);
       }
@@ -105,17 +105,17 @@ export function TaskProvider({ children }) {
   const deleteTask = useCallback(
     async (taskId) => {
       try {
-        // Mise à jour optimiste
+        // Update
         const previousTasks = [...tasks];
         setTasks((currentTasks) =>
           currentTasks.filter((task) => task.id !== taskId)
         );
 
-        // Appel API
+        // API call
         await storageService.deleteTask(taskId);
       } catch (err) {
         setError(err);
-        // Restaurer l'état précédent en cas d'erreur
+        // Restore previous state in case of error
         setTasks(previousTasks);
       }
     },
@@ -128,18 +128,18 @@ export function TaskProvider({ children }) {
         const task = tasks.find((t) => t.id === taskId);
         if (!task) return;
 
-        // Mise à jour optimiste
+        // Update
         setTasks((currentTasks) =>
           currentTasks.map((t) =>
             t.id === taskId ? { ...t, completed: !t.completed } : t
           )
         );
 
-        // Appel API
+        // API call
         await storageService.updateTask(taskId, { completed: !task.completed });
       } catch (err) {
         setError(err);
-        // Restaurer l'état précédent en rechargeant les tâches
+        // Restore previous state by reloading tasks
         const freshTasks = await storageService.getTasks();
         setTasks(freshTasks);
       }
@@ -150,18 +150,18 @@ export function TaskProvider({ children }) {
   const moveTask = useCallback(
     async (taskId, newLocation) => {
       try {
-        // Mise à jour optimiste
+        // Update
         setTasks((currentTasks) =>
           currentTasks.map((task) =>
             task.id === taskId ? { ...task, location: newLocation } : task
           )
         );
 
-        // Appel API
+        // API call
         await storageService.updateTask(taskId, { location: newLocation });
       } catch (err) {
         setError(err);
-        // Restaurer l'état précédent en rechargeant les tâches
+        // Restore previous state by reloading tasks
         const freshTasks = await storageService.getTasks();
         setTasks(freshTasks);
       }
@@ -180,18 +180,18 @@ export function TaskProvider({ children }) {
   }, []);
 
   const value = {
-    // État
+    // Status
     tasks,
     isFormOpen,
     editingTask,
     loading,
     error,
 
-    // Filtres
+    // Filters
     parkedTasks: tasks.filter((task) => task.location.type === "parking"),
     weekTasks: tasks.filter((task) => task.location.type === "week"),
 
-    // Actions tâches
+    // Task actions
     addTask,
     editTask,
     updateTask,
@@ -199,7 +199,7 @@ export function TaskProvider({ children }) {
     toggleTaskComplete,
     moveTask,
 
-    // Actions formulaire
+    // Form actions
     openTaskForm,
     closeTaskForm,
   };

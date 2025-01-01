@@ -9,7 +9,7 @@ class TaskStorageService {
   async getTasks() {
     try {
       if (this.user) {
-        // Récupérer depuis Supabase pour les utilisateurs connectés
+        // Retrieve from Supabase for logged-in users
         const { data, error } = await supabase
           .from("tasks")
           .select("*")
@@ -19,12 +19,12 @@ class TaskStorageService {
         if (error) throw error;
         return data;
       } else {
-        // Utiliser localStorage pour les utilisateurs non connectés
+        // Use localStorage for offline users
         const tasks = localStorage.getItem(STORAGE_KEY);
         return tasks ? JSON.parse(tasks) : [];
       }
     } catch (error) {
-      console.error("Erreur lors de la récupération des tâches:", error);
+      console.error("Error while retrieving tasks:", error);
       throw error;
     }
   }
@@ -41,7 +41,7 @@ class TaskStorageService {
         if (error) throw error;
         return data;
       } else {
-        // Pour localStorage, simuler un ID unique
+        // For localStorage, simulate a unique ID
         const newTask = { ...task, id: Date.now() };
         const tasks = await this.getTasks();
         tasks.push(newTask);
@@ -49,7 +49,7 @@ class TaskStorageService {
         return newTask;
       }
     } catch (error) {
-      console.error("Erreur lors de l'ajout de la tâche:", error);
+      console.error("Error adding task", error);
       throw error;
     }
   }
@@ -61,7 +61,7 @@ class TaskStorageService {
           .from("tasks")
           .update(updates)
           .eq("id", taskId)
-          .eq("user_id", this.user.id) // Sécurité supplémentaire
+          .eq("user_id", this.user.id) // Additional safety
           .select()
           .single();
 
@@ -76,7 +76,7 @@ class TaskStorageService {
         return updatedTasks.find((task) => task.id === taskId);
       }
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de la tâche:", error);
+      console.error("Error updating task:", error);
       throw error;
     }
   }
@@ -88,7 +88,7 @@ class TaskStorageService {
           .from("tasks")
           .delete()
           .eq("id", taskId)
-          .eq("user_id", this.user.id); // Sécurité supplémentaire
+          .eq("user_id", this.user.id); // Additional safety
 
         if (error) throw error;
       } else {
@@ -97,8 +97,57 @@ class TaskStorageService {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredTasks));
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression de la tâche:", error);
+      console.error("Error deleting task:", error);
       throw error;
+    }
+  }
+
+  // Private method for transforming a task for Supabase
+  #transformTaskForSupabase(task) {
+    return {
+      id: task.id,
+      title: task.title,
+      note: task.note || null,
+      location_type: task.location.type,
+      day: task.location.day || null,
+      period: task.location.period || null,
+      position: task.location.position,
+      completed: task.completed || false,
+      user_id: this.user.id,
+    };
+  }
+
+  // Data migration method
+  async migrateLocalToSupabase() {
+    try {
+      if (!this.user) {
+        throw new Error("User not logged in");
+      }
+
+      // 1. Recover local tasks
+      const localTasks = await this.getTasks();
+      if (localTasks.length === 0) return { success: true, data: [] };
+
+      // 2. Transform tasks
+      const transformedTasks = localTasks.map(this.#transformTaskForSupabase);
+
+      // 3. Insert tasks into Supabase
+      const { data, error } = await supabase
+        .from("tasks")
+        .insert(transformedTasks);
+
+      if (error) throw error;
+
+      // 4. If all goes well, empty localStorage
+      localStorage.removeItem(STORAGE_KEY);
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Error during migration:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
     }
   }
 }
